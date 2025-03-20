@@ -1,4 +1,4 @@
-module task-controller
+module github.com/sikigasa/Task-Controller
 
 go 1.24.1
 
