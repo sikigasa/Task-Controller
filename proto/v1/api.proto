@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-
+option go_package = "api/v1";
 // import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-package task_controller.api.v1;
+package task_controller.proto.v1;
 
 // The task service definition.
 service TaskService {
