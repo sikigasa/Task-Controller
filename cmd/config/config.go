@@ -21,5 +21,9 @@ func LoadEnv(path ...string) {
 		log.Fatalf("env load error: %v", err)
 	}
 
+	if err := env.Parse(&config.Postgres); err != nil {
+		log.Fatalf("env load error: %v", err)
+	}
+
 	Config = config
 }
