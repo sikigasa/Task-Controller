@@ -18,8 +18,22 @@ type PostgresConnection struct {
 	db *sql.DB
 }
 
-func NewPostgresConnection(connStr string) (*PostgresConnection, error) {
-	db, err := sql.Open("postgres", connStr)
+func NewPostgresConnection(
+	dbUser string,
+	dbPassword string,
+	dbHost string,
+	dbPort int,
+	dbName string,
+	dbSSLMode string) (*PostgresConnection, error) {
+	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
+		dbUser,
+		dbPassword,
+		dbHost,
+		dbPort,
+		dbName,
+		dbSSLMode,
+	)
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open connection: %w", err)
 	}
