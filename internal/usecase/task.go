@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/sikigasa/task-controller/internal/domain"
 	"github.com/sikigasa/task-controller/internal/infra"
 	task "github.com/sikigasa/task-controller/proto/v1"
@@ -20,7 +21,12 @@ func NewTaskService(taskRepo infra.TaskRepo) task.TaskServiceServer {
 }
 
 func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskRequest) (*task.CreateTaskResponse, error) {
+	uuid, err := uuid.NewV7()
+	if err != nil {
+		return nil, err
+	}
 	param := domain.CreateTaskParam{
+		ID:          uuid.String(),
 		Title:       req.Title,
 		Description: req.Description,
 		IsEnd:       false,
@@ -31,6 +37,6 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 	}
 
 	return &task.CreateTaskResponse{
-		Id: "generated-task-id", // Replace with actual task ID
+		Id: r, // Replace with actual task ID
 	}, nil
 }
