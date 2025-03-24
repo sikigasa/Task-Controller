@@ -13,7 +13,7 @@ gomigrate:
 	migrate create -ext sql -dir db/migrations -seq $(file)
 
 migrateup:
-	migrate --path db/migrations --database 'postgresql://root:password@localhost:5432/mydb?sslmode=disable' -verbose up
+	migrate --path db/migrations --database 'postgresql://root:password@localhost:5432/task?sslmode=disable' -verbose up
 
 migratedown:
-	migrate --path db/migrations --database 'postgresql://root:password@localhost:5432/mydb?sslmode=disable' -verbose down
+	migrate --path db/migrations --database 'postgresql://root:password@localhost:5432/task?sslmode=disable' -verbose down
