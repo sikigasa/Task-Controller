@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/sikigasa/task-controller/internal/domain"
 	"github.com/sikigasa/task-controller/internal/infra"
 	task "github.com/sikigasa/task-controller/proto/v1"
 )
@@ -19,10 +20,14 @@ func NewTaskService(taskRepo infra.TaskRepo) task.TaskServiceServer {
 }
 
 func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskRequest) (*task.CreateTaskResponse, error) {
-	param := task.CreateTaskParam{
+	param := domain.CreateTaskParam{
 		Title:       req.Title,
 		Description: req.Description,
-		IsEnd:       req.IsEnd,
+		IsEnd:       false,
+	}
+
+	if err := t.taskRepo.Create(ctx, param); err != nil {
+		return nil, err
 	}
 
 	return &task.CreateTaskResponse{
