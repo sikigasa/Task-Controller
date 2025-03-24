@@ -37,6 +37,6 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 	}
 
 	return &task.CreateTaskResponse{
-		Id: r, // Replace with actual task ID
+		Id: uuid.String(),
 	}, nil
 }
