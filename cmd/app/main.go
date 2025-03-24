@@ -15,6 +15,7 @@ import (
 	"github.com/sikigasa/task-controller/internal/usecase"
 	task "github.com/sikigasa/task-controller/proto/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -42,6 +43,7 @@ func main() {
 	s := grpc.NewServer()
 	task.RegisterTaskServiceServer(s, usecase.NewTaskService(infra.NewTaskRepo(db)))
 
+	reflection.Register(s)
 	// 作成したgRPCサーバーを、8080番ポートで稼働させる
 	go func() {
 		log.Printf("start gRPC server port: %v", port)
