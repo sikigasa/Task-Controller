@@ -11,3 +11,12 @@ CREATE TABLE tag (
   id VARCHAR PRIMARY KEY,
   name VARCHAR NOT NULL
 );
+
+CREATE TABLE task_tag (
+  task_id VARCHAR REFERENCES task(id) ON DELETE CASCADE,
+  tag_id VARCHAR REFERENCES tag(id) ON DELETE CASCADE,
+);
+
+ALTER TABLE "task_tag" ADD FOREIGN KEY ("task_id") REFERENCES "task" ("id");
+
+ALTER TABLE "task_tag" ADD FOREIGN KEY ("tag_id") REFERENCES "tag" ("id");
