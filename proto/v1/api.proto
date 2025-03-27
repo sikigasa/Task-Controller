@@ -26,7 +26,10 @@ message Task {
   string description = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
-  bool is_end = 6;
+  google.protobuf.Timestamp limited_at = 6;
+  bool is_end = 7;
+
+  repeated string tags = 8;
 }
 
 // The request message for creating a new task.
@@ -56,6 +59,8 @@ message UpdateTaskRequest {
   string id = 1;
   string title = 2;
   string description = 3;
+  google.protobuf.Timestamp limited_at = 4;
+  bool is_end = 5;
 }
 
 message UpdateTaskResponse {

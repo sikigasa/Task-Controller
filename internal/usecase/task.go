@@ -40,3 +40,23 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 		Id: uuid.String(),
 	}, nil
 }
+
+func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*task.GetTaskResponse, error) {
+	param := domain.GetTaskParam{
+		ID: req.Id,
+	}
+
+	tasks, err := t.taskRepo.Get(ctx, param)
+	if err != nil {
+		return nil, err
+	}
+
+	return &task.GetTaskResponse{
+		Task: &task.Task{
+			Id:          tasks.ID,
+			Title:       tasks.Title,
+			Description: tasks.Description,
+			IsEnd:       tasks.IsEnd,
+		},
+	}, nil
+}
