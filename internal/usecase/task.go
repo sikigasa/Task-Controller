@@ -46,17 +46,17 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		ID: req.Id,
 	}
 
-	tasks, err := t.taskRepo.Get(ctx, param)
+	taskDetail, err := t.taskRepo.Get(ctx, param)
 	if err != nil {
 		return nil, err
 	}
 
 	return &task.GetTaskResponse{
 		Task: &task.Task{
-			Id:          tasks.ID,
-			Title:       tasks.Title,
-			Description: tasks.Description,
-			IsEnd:       tasks.IsEnd,
+			Id:          taskDetail.ID,
+			Title:       taskDetail.Title,
+			Description: taskDetail.Description,
+			IsEnd:       taskDetail.IsEnd,
 		},
 	}, nil
 }
@@ -73,12 +73,12 @@ func (t *taskService) GetTasks(ctx context.Context, req *task.GetTasksRequest) (
 	}
 
 	var taskList []*task.Task
-	for _, task := range tasks {
+	for _, taskDetail := range tasks {
 		taskList = append(taskList, &task.Task{
-			Id:          task.ID,
-			Title:       task.Title,
-			Description: task.Description,
-			IsEnd:       task.IsEnd,
+			Id:          taskDetail.ID,
+			Title:       taskDetail.Title,
+			Description: taskDetail.Description,
+			IsEnd:       taskDetail.IsEnd,
 		})
 	}
 
