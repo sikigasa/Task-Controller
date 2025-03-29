@@ -60,3 +60,29 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		},
 	}, nil
 }
+
+func (t *taskService) GetTasks(ctx context.Context, req *task.GetTasksRequest) (*task.GetTasksResponse, error) {
+	param := domain.GetTasksParam{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+	}
+
+	tasks, err := t.taskRepo.GetAll(ctx, param)
+	if err != nil {
+		return nil, err
+	}
+
+	var taskList []*task.Task
+	for _, task := range tasks {
+		taskList = append(taskList, &task.Task{
+			Id:          task.ID,
+			Title:       task.Title,
+			Description: task.Description,
+			IsEnd:       task.IsEnd,
+		})
+	}
+
+	return &task.GetTasksResponse{
+		Task: taskList,
+	}, nil
+}
