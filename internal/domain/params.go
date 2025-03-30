@@ -11,6 +11,10 @@ type GetTaskParam struct {
 	ID string `json:"id"`
 }
 
+type GetAllTaskParam struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+}
 type UpdateTaskParam struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`

@@ -46,17 +46,43 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		ID: req.Id,
 	}
 
-	tasks, err := t.taskRepo.Get(ctx, param)
+	taskDetail, err := t.taskRepo.Get(ctx, param)
 	if err != nil {
 		return nil, err
 	}
 
 	return &task.GetTaskResponse{
 		Task: &task.Task{
-			Id:          tasks.ID,
-			Title:       tasks.Title,
-			Description: tasks.Description,
-			IsEnd:       tasks.IsEnd,
+			Id:          taskDetail.ID,
+			Title:       taskDetail.Title,
+			Description: taskDetail.Description,
+			IsEnd:       taskDetail.IsEnd,
 		},
+	}, nil
+}
+
+func (t *taskService) GetTasks(ctx context.Context, req *task.GetTasksRequest) (*task.GetTasksResponse, error) {
+	param := domain.GetTasksParam{
+		Limit:  req.Limit,
+		Offset: req.Offset,
+	}
+
+	tasks, err := t.taskRepo.GetAll(ctx, param)
+	if err != nil {
+		return nil, err
+	}
+
+	var taskList []*task.Task
+	for _, taskDetail := range tasks {
+		taskList = append(taskList, &task.Task{
+			Id:          taskDetail.ID,
+			Title:       taskDetail.Title,
+			Description: taskDetail.Description,
+			IsEnd:       taskDetail.IsEnd,
+		})
+	}
+
+	return &task.GetTasksResponse{
+		Task: taskList,
 	}, nil
 }
