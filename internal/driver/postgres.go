@@ -25,11 +25,11 @@ func NewPostgresConnection(
 	dbPort int,
 	dbName string,
 	dbSSLMode string) (*PostgresConnection, error) {
-	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=%s",
-		dbUser,
-		dbPassword,
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
 		dbHost,
 		dbPort,
+		dbUser,
+		dbPassword,
 		dbName,
 		dbSSLMode,
 	)
