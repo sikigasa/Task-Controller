@@ -14,7 +14,7 @@ type taskRepo struct {
 type TaskRepo interface {
 	Create(ctx context.Context, arg domain.CreateTaskParam) error
 	Get(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error)
-	GetAll(ctx context.Context, arg domain.GetAllTaskParam) ([]domain.Task, error)
+	GetAll(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error)
 	Update(ctx context.Context, arg domain.UpdateTaskParam) error
 	Delete(ctx context.Context, arg domain.DeleteTaskParam) error
 }
@@ -41,7 +41,7 @@ func (t *taskRepo) Get(ctx context.Context, arg domain.GetTaskParam) (*domain.Ta
 	return &task, nil
 }
 
-func (t *taskRepo) GetAll(ctx context.Context, arg domain.GetAllTaskParam) ([]domain.Task, error) {
+func (t *taskRepo) GetAll(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error) {
 	const query = `SELECT task_id,project_id,authority FROM tasks LIMIT $1 OFFSET $2`
 	rows, err := t.db.QueryContext(ctx, query, arg.Limit, arg.Offset)
 	if err != nil {

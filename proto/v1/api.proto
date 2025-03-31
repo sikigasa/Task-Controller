@@ -12,12 +12,13 @@ service TaskService {
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
   // Read a task by ID.
   rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  // List all tasks optional limit and offset.
+  rpc ListTask(ListTaskRequest) returns (ListTaskResponse);
   // Update an existing task.
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
   // Delete a task by ID.
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
-  // List all tasks.
-  rpc ListTask(ListTaskRequest) returns (ListTaskResponse);
+  
 }
 
 message Task {

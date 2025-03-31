@@ -61,8 +61,8 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 	}, nil
 }
 
-func (t *taskService) GetTasks(ctx context.Context, req *task.GetTasksRequest) (*task.GetTasksResponse, error) {
-	param := domain.GetTasksParam{
+func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (*task.ListTaskResponse, error) {
+	param := domain.ListTaskParam{
 		Limit:  req.Limit,
 		Offset: req.Offset,
 	}
@@ -82,7 +82,7 @@ func (t *taskService) GetTasks(ctx context.Context, req *task.GetTasksRequest) (
 		})
 	}
 
-	return &task.GetTasksResponse{
-		Task: taskList,
+	return &task.ListTaskResponse{
+		Tasks: taskList,
 	}, nil
 }
