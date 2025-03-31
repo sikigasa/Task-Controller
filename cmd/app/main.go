@@ -18,6 +18,10 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+func init() {
+	config.LoadEnv(".env")
+}
+
 func main() {
 	// 8080番portのListenerを作成
 	port := 8080
