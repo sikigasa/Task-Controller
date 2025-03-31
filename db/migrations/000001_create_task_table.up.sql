@@ -1,4 +1,5 @@
-CREATE TABLE task (
+
+CREATE TABLE "task" (
   id VARCHAR PRIMARY KEY,
   title VARCHAR NOT NULL,
   description TEXT,
@@ -8,12 +9,12 @@ CREATE TABLE task (
   is_end BOOLEAN DEFAULT FALSE
 );
 
-CREATE TABLE tag (
+CREATE TABLE "tag" (
   id VARCHAR PRIMARY KEY,
   name VARCHAR NOT NULL
 );
 
-CREATE TABLE task_tag (
+CREATE TABLE "task_tag" (
   task_id VARCHAR REFERENCES task(id) ON DELETE CASCADE,
   tag_id VARCHAR REFERENCES tag(id) ON DELETE CASCADE,
 );
