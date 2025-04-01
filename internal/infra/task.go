@@ -12,18 +12,18 @@ type taskRepo struct {
 }
 
 type TaskRepo interface {
-	Create(ctx context.Context, arg domain.CreateTaskParam) error
-	Get(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error)
-	GetAll(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error)
-	Update(ctx context.Context, arg domain.UpdateTaskParam) error
-	Delete(ctx context.Context, arg domain.DeleteTaskParam) error
+	CreateTask(ctx context.Context, arg domain.CreateTaskParam) error
+	GetTask(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error)
+	GetAllTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error)
+	UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error
+	DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error
 }
 
 func NewTaskRepo(db *sql.DB) TaskRepo {
 	return &taskRepo{db: db}
 }
 
-func (t *taskRepo) Create(ctx context.Context, arg domain.CreateTaskParam) error {
+func (t *taskRepo) CreateTask(ctx context.Context, arg domain.CreateTaskParam) error {
 	const query = `INSERT INTO task (id, title, description, limited_at, is_end) VALUES ($1,$2,$3)`
 
 	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Title, arg.Description, arg.IsEnd)
@@ -31,7 +31,7 @@ func (t *taskRepo) Create(ctx context.Context, arg domain.CreateTaskParam) error
 	return row.Err()
 }
 
-func (t *taskRepo) Get(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error) {
+func (t *taskRepo) GetTask(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error) {
 	const query = `SELECT task_id,project_id,authority FROM task WHERE task_id = $1`
 	row := t.db.QueryRowContext(ctx, query, arg.ID)
 	var task domain.Task
@@ -41,7 +41,7 @@ func (t *taskRepo) Get(ctx context.Context, arg domain.GetTaskParam) (*domain.Ta
 	return &task, nil
 }
 
-func (t *taskRepo) GetAll(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error) {
+func (t *taskRepo) GetAllTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error) {
 	const query = `SELECT task_id,project_id,authority FROM task LIMIT $1 OFFSET $2`
 	rows, err := t.db.QueryContext(ctx, query, arg.Limit, arg.Offset)
 	if err != nil {
@@ -63,13 +63,13 @@ func (t *taskRepo) GetAll(ctx context.Context, arg domain.ListTaskParam) ([]doma
 
 }
 
-func (t *taskRepo) Update(ctx context.Context, arg domain.UpdateTaskParam) error {
+func (t *taskRepo) UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error {
 	const query = `UPDATE task SET title = $1, description = $2 WHERE task_id = $3`
 	row := t.db.QueryRowContext(ctx, query, arg.Title, arg.Description, arg.ID)
 	return row.Err()
 }
 
-func (t *taskRepo) Delete(ctx context.Context, arg domain.DeleteTaskParam) error {
+func (t *taskRepo) DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error {
 	const query = `DELETE FROM task WHERE project_id = $1`
 	row, err := t.db.ExecContext(ctx, query, arg.ID)
 	if err != nil {
