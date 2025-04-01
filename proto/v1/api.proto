@@ -96,3 +96,23 @@ message CreateTagRequest {
 message CreateTagResponse {
   string id = 1;
 }
+message ListTagRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+message ListTagResponse {
+  repeated Tag tags = 1;
+}
+message UpdateTagRequest {
+  string id = 1;
+  string name = 2;
+}
+message UpdateTagResponse {
+  Tag tag = 1;
+}
+message DeleteTagRequest {
+  string id = 1;
+}
+message DeleteTagResponse {
+  bool success = 1;
+}
