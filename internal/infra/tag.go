@@ -12,7 +12,7 @@ type tagRepo struct {
 }
 
 type TagRepo interface {
-	CreateTag(ctx context.Context, arg domain.CreateTaskParam) error
+	CreateTag(ctx context.Context, arg domain.CreateTagParam) error
 	ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error)
 	DeleteTag(ctx context.Context, arg domain.DeleteTagParam) error
 }
@@ -21,10 +21,10 @@ func NewTagRepo(db *sql.DB) TagRepo {
 	return &tagRepo{db: db}
 }
 
-func (t *tagRepo) CreateTag(ctx context.Context, arg domain.CreateTaskParam) error {
+func (t *tagRepo) CreateTag(ctx context.Context, arg domain.CreateTagParam) error {
 	const query = `INSERT INTO Tag (id, name) VALUES ($1,$2)`
 
-	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Title, arg.Description, arg.IsEnd)
+	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Name)
 
 	return row.Err()
 }
