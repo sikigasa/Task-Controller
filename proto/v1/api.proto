@@ -24,7 +24,7 @@ service TaskService {
   // List all tags.
   rpc ListTag(ListTagRequest) returns (ListTagResponse);
   // Update an existing tag.
-  rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse);
+  // rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse);
   // Delete a tag by ID.
   rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse);
 }
@@ -102,13 +102,6 @@ message ListTagRequest {
 }
 message ListTagResponse {
   repeated Tag tags = 1;
-}
-message UpdateTagRequest {
-  string id = 1;
-  string name = 2;
-}
-message UpdateTagResponse {
-  Tag tag = 1;
 }
 message DeleteTagRequest {
   string id = 1;
