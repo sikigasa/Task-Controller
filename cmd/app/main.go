@@ -46,6 +46,7 @@ func main() {
 	// gRPCサーバーを作成
 	s := grpc.NewServer()
 	task.RegisterTaskServiceServer(s, usecase.NewTaskService(infra.NewTaskRepo(db)))
+	task.RegisterTagServiceServer(s, usecase.NewTagService(infra.NewTagRepo(db)))
 
 	reflection.Register(s)
 	// 作成したgRPCサーバーを、8080番ポートで稼働させる
