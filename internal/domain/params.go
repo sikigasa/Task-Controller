@@ -8,6 +8,8 @@ type CreateTaskParam struct {
 	Description string    `json:"description"`
 	LimitedAt   time.Time `json:"limited_at"`
 	IsEnd       bool      `json:"is_end"`
+
+	TagIDs []string `json:"tag_ids"`
 }
 
 type GetTaskParam struct {
@@ -27,5 +29,23 @@ type UpdateTaskParam struct {
 }
 
 type DeleteTaskParam struct {
+	ID string `json:"id"`
+}
+
+type CreateTagParam struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type GetTagParam struct {
+	ID string `json:"id"`
+}
+
+type ListTagParam struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+type DeleteTagParam struct {
 	ID string `json:"id"`
 }
