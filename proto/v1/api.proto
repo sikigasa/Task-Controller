@@ -23,8 +23,6 @@ service TaskService {
   rpc CreateTag(CreateTagRequest) returns (CreateTagResponse);
   // List all tags.
   rpc ListTag(ListTagRequest) returns (ListTagResponse);
-  // Update an existing tag.
-  // rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse);
   // Delete a tag by ID.
   rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse);
 }
