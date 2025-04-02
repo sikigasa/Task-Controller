@@ -49,8 +49,6 @@ type TaskServiceClient interface {
 	CreateTag(ctx context.Context, in *CreateTagRequest, opts ...grpc.CallOption) (*CreateTagResponse, error)
 	// List all tags.
 	ListTag(ctx context.Context, in *ListTagRequest, opts ...grpc.CallOption) (*ListTagResponse, error)
-	// Update an existing tag.
-	// rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse);
 	// Delete a tag by ID.
 	DeleteTag(ctx context.Context, in *DeleteTagRequest, opts ...grpc.CallOption) (*DeleteTagResponse, error)
 }
@@ -163,8 +161,6 @@ type TaskServiceServer interface {
 	CreateTag(context.Context, *CreateTagRequest) (*CreateTagResponse, error)
 	// List all tags.
 	ListTag(context.Context, *ListTagRequest) (*ListTagResponse, error)
-	// Update an existing tag.
-	// rpc UpdateTag(UpdateTagRequest) returns (UpdateTagResponse);
 	// Delete a tag by ID.
 	DeleteTag(context.Context, *DeleteTagRequest) (*DeleteTagResponse, error)
 	mustEmbedUnimplementedTaskServiceServer()
