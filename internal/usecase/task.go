@@ -32,7 +32,7 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 		IsEnd:       false,
 	}
 
-	if err := t.taskRepo.Create(ctx, param); err != nil {
+	if err := t.taskRepo.CreateTask(ctx, param); err != nil {
 		return nil, err
 	}
 
@@ -46,7 +46,7 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		ID: req.Id,
 	}
 
-	taskDetail, err := t.taskRepo.Get(ctx, param)
+	taskDetail, err := t.taskRepo.GetTask(ctx, param)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 		Offset: req.Offset,
 	}
 
-	tasks, err := t.taskRepo.GetAll(ctx, param)
+	tasks, err := t.taskRepo.GetAllTask(ctx, param)
 	if err != nil {
 		return nil, err
 	}

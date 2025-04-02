@@ -1,4 +1,4 @@
-.PHONY: genswag genproto run
+.PHONY: genswag genproto run gomigrate migrateup migratedown
 
 run:
 	go run cmd/app/main.go

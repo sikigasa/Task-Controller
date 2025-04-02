@@ -18,7 +18,14 @@ service TaskService {
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
   // Delete a task by ID.
   rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
-  
+}
+service TagService {
+  // Create a new tag.
+  rpc CreateTag(CreateTagRequest) returns (CreateTagResponse);
+  // List all tags optional limit and offset.
+  rpc ListTag(ListTagRequest) returns (ListTagResponse);
+  // Delete a tag by ID.
+  rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse);
 }
 
 message Task {
@@ -30,7 +37,7 @@ message Task {
   google.protobuf.Timestamp limited_at = 6;
   bool is_end = 7;
 
-  repeated string tags = 8;
+  repeated string tag_ids = 8;
 }
 
 // The request message for creating a new task.
@@ -74,5 +81,30 @@ message DeleteTaskRequest {
 
 // The response message for delete operation.
 message DeleteTaskResponse {
+  bool success = 1;
+}
+
+message Tag {
+  string id = 1;
+  string name = 2;
+}
+
+message CreateTagRequest {
+  string name = 1;
+}
+message CreateTagResponse {
+  string id = 1;
+}
+message ListTagRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+message ListTagResponse {
+  repeated Tag tags = 1;
+}
+message DeleteTagRequest {
+  string id = 1;
+}
+message DeleteTagResponse {
   bool success = 1;
 }
