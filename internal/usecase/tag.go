@@ -1,13 +1,11 @@
 package usecase
 
 import (
-	"context"
-
-	"github.com/sikigasa/task-controller/internal/domain"
+	"github.com/sikigasa/task-controller/internal/infra"
+	tag "github.com/sikigasa/task-controller/proto/v1"
 )
 
-type TagService interface {
-	CreateTag(ctx context.Context, param domain.CreateTagParam) (domain.Tag, error)
-	ListTag(ctx context.Context, param domain.ListTagParam) ([]domain.Tag, error)
-	DeleteTag(ctx context.Context, param domain.DeleteTagParam) error
+type TagService struct {
+	tag.UnimplementedTaskServiceServer
+	tagRepo infra.TagRepo
 }

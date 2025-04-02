@@ -2,11 +2,26 @@ package infra
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/sikigasa/task-controller/internal/domain"
 )
 
-func (t *taskRepo) CreateTag(ctx context.Context, arg domain.CreateTaskParam) error {
+type tagRepo struct {
+	db *sql.DB
+}
+
+type TagRepo interface {
+	CreateTag(ctx context.Context, arg domain.CreateTaskParam) error
+	ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error)
+	DeleteTag(ctx context.Context, arg domain.DeleteTagParam) error
+}
+
+func NewTagRepo(db *sql.DB) TagRepo {
+	return &tagRepo{db: db}
+}
+
+func (t *tagRepo) CreateTag(ctx context.Context, arg domain.CreateTaskParam) error {
 	const query = `INSERT INTO Tag (id, name) VALUES ($1,$2)`
 
 	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Title, arg.Description, arg.IsEnd)
@@ -14,7 +29,7 @@ func (t *taskRepo) CreateTag(ctx context.Context, arg domain.CreateTaskParam) er
 	return row.Err()
 }
 
-func (t *taskRepo) ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error) {
+func (t *tagRepo) ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error) {
 	const query = `SELECT id, name FROM Tag LIMIT $1 OFFSET $2`
 
 	rows, err := t.db.QueryContext(ctx, query, arg.Limit, arg.Offset)
@@ -35,7 +50,7 @@ func (t *taskRepo) ListTag(ctx context.Context, arg domain.ListTagParam) ([]doma
 	return tags, nil
 }
 
-func (t *taskRepo) DeleteTag(ctx context.Context, arg domain.DeleteTagParam) error {
+func (t *tagRepo) DeleteTag(ctx context.Context, arg domain.DeleteTagParam) error {
 	const query = `DELETE FROM Tag WHERE id = $1`
 
 	row := t.db.QueryRowContext(ctx, query, arg.ID)
