@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/sikigasa/task-controller/cmd/config"
-	postgres "github.com/sikigasa/task-controller/internal/driver"
 	"github.com/sikigasa/task-controller/internal/infra"
+	postgres "github.com/sikigasa/task-controller/internal/infra/driver"
 	"github.com/sikigasa/task-controller/internal/usecase"
 	task "github.com/sikigasa/task-controller/proto/v1"
 	"google.golang.org/grpc"
@@ -45,7 +45,7 @@ func main() {
 
 	// gRPCサーバーを作成
 	s := grpc.NewServer()
-	task.RegisterTaskServiceServer(s, usecase.NewTaskService(infra.NewTaskRepo(db)))
+	task.RegisterTaskServiceServer(s, usecase.NewTaskService(infra.NewTaskRepo(db), infra.NewTaskTagRepo(db)))
 	task.RegisterTagServiceServer(s, usecase.NewTagService(infra.NewTagRepo(db)))
 
 	reflection.Register(s)

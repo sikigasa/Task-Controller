@@ -49,3 +49,13 @@ type ListTagParam struct {
 type DeleteTagParam struct {
 	ID string `json:"id"`
 }
+
+type CreateTaskTagParam struct {
+	TaskID string `json:"task_id"`
+	TagID  string `json:"tag_id"`
+}
+
+type DeleteTaskTagParam struct {
+	TaskID string `json:"task_id"`
+	TagID  string `json:"tag_id"`
+}

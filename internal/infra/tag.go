@@ -32,6 +32,9 @@ func (t *tagRepo) CreateTag(ctx context.Context, arg domain.CreateTagParam) erro
 func (t *tagRepo) ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error) {
 	const query = `SELECT id, name FROM Tag LIMIT $1 OFFSET $2`
 
+	if arg.Limit == 0 {
+		arg.Limit = 100
+	}
 	rows, err := t.db.QueryContext(ctx, query, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
