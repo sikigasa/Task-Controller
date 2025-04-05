@@ -19,6 +19,7 @@ func NewTagService(tagRepo infra.TagRepo) tag.TagServiceServer {
 		tagRepo: tagRepo,
 	}
 }
+
 func (t *TagService) CreateTag(ctx context.Context, req *tag.CreateTagRequest) (*tag.CreateTagResponse, error) {
 	uuid, err := uuid.NewV7()
 	if err != nil {
