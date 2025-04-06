@@ -37,13 +37,15 @@ message Task {
   google.protobuf.Timestamp limited_at = 6;
   bool is_end = 7;
 
-  repeated string tag_ids = 8;
+  repeated Tag tags = 8;
 }
 
 // The request message for creating a new task.
 message CreateTaskRequest {
   string title = 1;
   string description = 2;
+  google.protobuf.Timestamp limited_at = 3;
+  repeated Tag tag_ids = 4;
 }
 
 message CreateTaskResponse {
@@ -69,6 +71,7 @@ message UpdateTaskRequest {
   string description = 3;
   google.protobuf.Timestamp limited_at = 4;
   bool is_end = 5;
+  repeated string tag_ids = 6;
 }
 
 message UpdateTaskResponse {
