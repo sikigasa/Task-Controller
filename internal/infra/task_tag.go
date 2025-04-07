@@ -13,7 +13,7 @@ type taskTagRepo struct {
 
 type TaskTagRepo interface {
 	CreateTaskTag(ctx context.Context, arg domain.CreateTaskTagParam) error
-	DeleteTaskTag(ctx context.Context, arg domain.DeleteTaskTagParam) error
+	DeleteTaskTags(ctx context.Context, arg domain.DeleteTaskTagParam) error
 }
 
 func NewTaskTagRepo(db *sql.DB) TaskTagRepo {
@@ -28,10 +28,9 @@ func (t *taskTagRepo) CreateTaskTag(ctx context.Context, arg domain.CreateTaskTa
 	return row.Err()
 }
 
-func (t *taskTagRepo) DeleteTaskTag(ctx context.Context, arg domain.DeleteTaskTagParam) error {
-	const query = `DELETE FROM task_tag WHERE task_id = $1 AND tag_id = $2`
-
-	row := t.db.QueryRowContext(ctx, query, arg.TaskID, arg.TagID)
+func (t *taskTagRepo) DeleteTaskTags(ctx context.Context, arg domain.DeleteTaskTagParam) error {
+	const query = `DELETE FROM task_tag WHERE task_id = $1`
+	row := t.db.QueryRowContext(ctx, query, arg.TaskID)
 
 	return row.Err()
 }
