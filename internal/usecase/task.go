@@ -43,7 +43,6 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 		if err := t.taskRepo.CreateTask(ctx, param); err != nil {
 			return err
 		}
-
 		for _, tagID := range req.TagIds {
 			taskTagParam := domain.CreateTaskTagParam{
 				TaskID: param.ID,
@@ -109,4 +108,57 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 	return &task.ListTaskResponse{
 		Tasks: taskList,
 	}, nil
+}
+
+func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskRequest) (*task.UpdateTaskResponse, error) {
+	err := t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
+		param := domain.UpdateTaskParam{
+			ID:          req.Id,
+			Title:       req.Title,
+			Description: req.Description,
+		}
+		if err := t.taskRepo.UpdateTask(ctx, param); err != nil {
+			return err
+		}
+		if err := t.taskTagRepo.DeleteTaskTags(ctx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
+			return err
+		}
+		for _, tagID := range req.TagIds {
+			taskTagParam := domain.CreateTaskTagParam{
+				TaskID: param.ID,
+				TagID:  tagID,
+			}
+			if err := t.taskTagRepo.CreateTaskTag(ctx, taskTagParam); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &task.UpdateTaskResponse{}, nil
+}
+
+func (t *taskService) DeleteTask(ctx context.Context, req *task.DeleteTaskRequest) (*task.DeleteTaskResponse, error) {
+	err := t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
+		if err := t.taskTagRepo.DeleteTaskTags(ctx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
+			return err
+		}
+
+		param := domain.DeleteTaskParam{
+			ID: req.Id,
+		}
+		if err := t.taskRepo.DeleteTask(ctx, param); err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &task.DeleteTaskResponse{}, nil
 }
