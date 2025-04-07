@@ -13,6 +13,7 @@ type tagRepo struct {
 
 type TagRepo interface {
 	CreateTag(ctx context.Context, arg domain.CreateTagParam) error
+	GetTag(ctx context.Context, arg domain.GetTagParam) (*domain.Tag, error)
 	ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error)
 	DeleteTag(ctx context.Context, arg domain.DeleteTagParam) error
 }
@@ -27,6 +28,18 @@ func (t *tagRepo) CreateTag(ctx context.Context, arg domain.CreateTagParam) erro
 	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Name)
 
 	return row.Err()
+}
+
+func (t *tagRepo) GetTag(ctx context.Context, arg domain.GetTagParam) (*domain.Tag, error) {
+	const query = `SELECT id, name FROM Tag WHERE id = $1`
+
+	row := t.db.QueryRowContext(ctx, query, arg.ID)
+
+	var tag domain.Tag
+	if err := row.Scan(&tag.ID, &tag.Name); err != nil {
+		return nil, err
+	}
+	return &tag, nil
 }
 
 func (t *tagRepo) ListTag(ctx context.Context, arg domain.ListTagParam) ([]domain.Tag, error) {
