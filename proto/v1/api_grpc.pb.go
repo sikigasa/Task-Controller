@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	TaskService_CreateTask_FullMethodName = "/task_controller.v1.TaskService/CreateTask"
-	TaskService_GetTask_FullMethodName    = "/task_controller.v1.TaskService/GetTask"
-	TaskService_ListTask_FullMethodName   = "/task_controller.v1.TaskService/ListTask"
-	TaskService_UpdateTask_FullMethodName = "/task_controller.v1.TaskService/UpdateTask"
-	TaskService_DeleteTask_FullMethodName = "/task_controller.v1.TaskService/DeleteTask"
+	TaskService_CreateTask_FullMethodName = "/task_controller.proto.v1.TaskService/CreateTask"
+	TaskService_GetTask_FullMethodName    = "/task_controller.proto.v1.TaskService/GetTask"
+	TaskService_ListTask_FullMethodName   = "/task_controller.proto.v1.TaskService/ListTask"
+	TaskService_UpdateTask_FullMethodName = "/task_controller.proto.v1.TaskService/UpdateTask"
+	TaskService_DeleteTask_FullMethodName = "/task_controller.proto.v1.TaskService/DeleteTask"
 )
 
 // TaskServiceClient is the client API for TaskService service.
@@ -247,7 +247,7 @@ func _TaskService_DeleteTask_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TaskService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "task_controller.v1.TaskService",
+	ServiceName: "task_controller.proto.v1.TaskService",
 	HandlerType: (*TaskServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -276,9 +276,9 @@ var TaskService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	TagService_CreateTag_FullMethodName = "/task_controller.v1.TagService/CreateTag"
-	TagService_ListTag_FullMethodName   = "/task_controller.v1.TagService/ListTag"
-	TagService_DeleteTag_FullMethodName = "/task_controller.v1.TagService/DeleteTag"
+	TagService_CreateTag_FullMethodName = "/task_controller.proto.v1.TagService/CreateTag"
+	TagService_ListTag_FullMethodName   = "/task_controller.proto.v1.TagService/ListTag"
+	TagService_DeleteTag_FullMethodName = "/task_controller.proto.v1.TagService/DeleteTag"
 )
 
 // TagServiceClient is the client API for TagService service.
@@ -428,7 +428,7 @@ func _TagService_DeleteTag_Handler(srv interface{}, ctx context.Context, dec fun
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var TagService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "task_controller.v1.TagService",
+	ServiceName: "task_controller.proto.v1.TagService",
 	HandlerType: (*TagServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
