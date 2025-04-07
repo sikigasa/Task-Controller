@@ -2,24 +2,27 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 	"github.com/sikigasa/task-controller/internal/domain"
 	"github.com/sikigasa/task-controller/internal/infra"
+	postgres "github.com/sikigasa/task-controller/internal/infra/driver"
 	task "github.com/sikigasa/task-controller/proto/v1"
 )
 
 type taskService struct {
 	task.UnimplementedTaskServiceServer
-	// tx infra
 	taskRepo    infra.TaskRepo
 	taskTagRepo infra.TaskTagRepo
+	tx          postgres.Transaction
 }
 
-func NewTaskService(taskRepo infra.TaskRepo, taskTagRepo infra.TaskTagRepo) task.TaskServiceServer {
+func NewTaskService(taskRepo infra.TaskRepo, taskTagRepo infra.TaskTagRepo, tx postgres.Transaction) task.TaskServiceServer {
 	return &taskService{
 		taskRepo:    taskRepo,
 		taskTagRepo: taskTagRepo,
+		tx:          tx,
 	}
 }
 
@@ -28,25 +31,33 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 	if err != nil {
 		return nil, err
 	}
-	param := domain.CreateTaskParam{
-		ID:          uuid.String(),
-		Title:       req.Title,
-		Description: req.Description,
-		IsEnd:       false,
-	}
 
-	if err := t.taskRepo.CreateTask(ctx, param); err != nil {
+	err = t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
+		param := domain.CreateTaskParam{
+			ID:          uuid.String(),
+			Title:       req.Title,
+			Description: req.Description,
+			IsEnd:       false,
+		}
+
+		if err := t.taskRepo.CreateTask(ctx, param); err != nil {
+			return err
+		}
+
+		for _, tagID := range req.TagIds {
+			taskTagParam := domain.CreateTaskTagParam{
+				TaskID: param.ID,
+				TagID:  tagID,
+			}
+			if err := t.taskTagRepo.CreateTaskTag(ctx, taskTagParam); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
-	}
-
-	for _, tagID := range req.TagIds {
-		taskTagParam := domain.CreateTaskTagParam{
-			TaskID: param.ID,
-			TagID:  tagID,
-		}
-		if err := t.taskTagRepo.CreateTaskTag(ctx, taskTagParam); err != nil {
-			return nil, err
-		}
 	}
 
 	return &task.CreateTaskResponse{
