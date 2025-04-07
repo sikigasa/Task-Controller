@@ -45,7 +45,7 @@ func main() {
 
 	// gRPCサーバーを作成
 	s := grpc.NewServer()
-	task.RegisterTaskServiceServer(s, usecase.NewTaskService(infra.NewTaskRepo(db), infra.NewTaskTagRepo(db)))
+	task.RegisterTaskServiceServer(s, usecase.NewTaskService(infra.NewTaskRepo(db), infra.NewTagRepo(db), infra.NewTaskTagRepo(db), postgres.NewPostgresTransaction(db)))
 	task.RegisterTagServiceServer(s, usecase.NewTagService(infra.NewTagRepo(db)))
 
 	reflection.Register(s)

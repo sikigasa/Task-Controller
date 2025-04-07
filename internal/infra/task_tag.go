@@ -13,7 +13,8 @@ type taskTagRepo struct {
 
 type TaskTagRepo interface {
 	CreateTaskTag(ctx context.Context, arg domain.CreateTaskTagParam) error
-	DeleteTaskTag(ctx context.Context, arg domain.DeleteTaskTagParam) error
+	GetTaskTagIDs(ctx context.Context, arg domain.GetTaskTagParam) ([]domain.TaskTag, error)
+	DeleteTaskTags(ctx context.Context, arg domain.DeleteTaskTagParam) error
 }
 
 func NewTaskTagRepo(db *sql.DB) TaskTagRepo {
@@ -28,10 +29,29 @@ func (t *taskTagRepo) CreateTaskTag(ctx context.Context, arg domain.CreateTaskTa
 	return row.Err()
 }
 
-func (t *taskTagRepo) DeleteTaskTag(ctx context.Context, arg domain.DeleteTaskTagParam) error {
-	const query = `DELETE FROM task_tag WHERE task_id = $1 AND tag_id = $2`
+func (t *taskTagRepo) GetTaskTagIDs(ctx context.Context, arg domain.GetTaskTagParam) ([]domain.TaskTag, error) {
+	const query = `SELECT * FROM task_tag WHERE task_id = $1`
 
-	row := t.db.QueryRowContext(ctx, query, arg.TaskID, arg.TagID)
+	rows, err := t.db.QueryContext(ctx, query, arg.TaskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var taskTags []domain.TaskTag
+	for rows.Next() {
+		var taskTag domain.TaskTag
+		if err := rows.Scan(&taskTag.TaskID, &taskTag.TagID); err != nil {
+			return nil, err
+		}
+		taskTags = append(taskTags, taskTag)
+	}
+	return taskTags, nil
+}
+
+func (t *taskTagRepo) DeleteTaskTags(ctx context.Context, arg domain.DeleteTaskTagParam) error {
+	const query = `DELETE FROM task_tag WHERE task_id = $1`
+	row := t.db.QueryRowContext(ctx, query, arg.TaskID)
 
 	return row.Err()
 }

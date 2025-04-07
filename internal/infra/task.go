@@ -14,7 +14,7 @@ type taskRepo struct {
 type TaskRepo interface {
 	CreateTask(ctx context.Context, arg domain.CreateTaskParam) error
 	GetTask(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error)
-	GetAllTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error)
+	ListTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error)
 	UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error
 	DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error
 }
@@ -24,7 +24,7 @@ func NewTaskRepo(db *sql.DB) TaskRepo {
 }
 
 func (t *taskRepo) CreateTask(ctx context.Context, arg domain.CreateTaskParam) error {
-	const query = `INSERT INTO task (id, title, description, limited_at, is_end) VALUES ($1,$2,$3)`
+	const query = `INSERT INTO task (id, title, description, limited_at, is_end) VALUES ($1,$2,$3,$4,$5)`
 
 	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Title, arg.Description, arg.LimitedAt, arg.IsEnd)
 
@@ -32,17 +32,17 @@ func (t *taskRepo) CreateTask(ctx context.Context, arg domain.CreateTaskParam) e
 }
 
 func (t *taskRepo) GetTask(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error) {
-	const query = `SELECT task_id,project_id,authority FROM task WHERE task_id = $1`
+	const query = `SELECT * FROM task WHERE id = $1`
 	row := t.db.QueryRowContext(ctx, query, arg.ID)
 	var task domain.Task
-	if err := row.Scan(&task.ID, &task.Title, &task.Description); err != nil {
+	if err := row.Scan(&task.ID, &task.Title, &task.Description, &task.CreatedAt, &task.UpdateAt, &task.LimitedAt, &task.IsEnd); err != nil {
 		return nil, err
 	}
 	return &task, nil
 }
 
-func (t *taskRepo) GetAllTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error) {
-	const query = `SELECT task_id,project_id,authority FROM task LIMIT $1 OFFSET $2`
+func (t *taskRepo) ListTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error) {
+	const query = `SELECT * FROM task LIMIT $1 OFFSET $2`
 	rows, err := t.db.QueryContext(ctx, query, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (t *taskRepo) GetAllTask(ctx context.Context, arg domain.ListTaskParam) ([]
 	var tasks []domain.Task
 	for rows.Next() {
 		var task domain.Task
-		if err := rows.Scan(&task.ID, &task.Title, &task.Description); err != nil {
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.CreatedAt, &task.UpdateAt, &task.LimitedAt, &task.IsEnd); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -63,14 +63,15 @@ func (t *taskRepo) GetAllTask(ctx context.Context, arg domain.ListTaskParam) ([]
 
 }
 
+// ToDo
 func (t *taskRepo) UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error {
-	const query = `UPDATE task SET title = $1, description = $2 WHERE task_id = $3`
+	const query = `UPDATE task SET title = $1, description = $2 WHERE id = $3`
 	row := t.db.QueryRowContext(ctx, query, arg.Title, arg.Description, arg.ID)
 	return row.Err()
 }
 
 func (t *taskRepo) DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error {
-	const query = `DELETE FROM task WHERE project_id = $1`
+	const query = `DELETE FROM task WHERE id = $1`
 	row, err := t.db.ExecContext(ctx, query, arg.ID)
 	if err != nil {
 		return err
