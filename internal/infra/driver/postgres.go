@@ -59,20 +59,3 @@ func (p *PostgresConnection) Close(ctx context.Context) error {
 	}
 	return nil
 }
-func (p *PostgresConnection) WithTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
-	conn, err := p.Connection()
-	if err != nil {
-		return err
-	}
-	tx, err := conn.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	if err := fn(tx); err != nil {
-		_ = tx.Rollback()
-		return err
-	}
-
-	return tx.Commit()
-}
