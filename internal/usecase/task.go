@@ -90,7 +90,7 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 		Offset: req.Offset,
 	}
 
-	tasks, err := t.taskRepo.GetAllTask(ctx, param)
+	tasks, err := t.taskRepo.ListTask(ctx, param)
 	if err != nil {
 		return nil, err
 	}
