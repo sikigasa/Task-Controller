@@ -55,6 +55,10 @@ type CreateTaskTagParam struct {
 	TagID  string `json:"tag_id"`
 }
 
+type GetTaskTagParam struct {
+	TaskID string `json:"task_id"`
+}
+
 type DeleteTaskTagParam struct {
 	TaskID string `json:"task_id"`
 }
