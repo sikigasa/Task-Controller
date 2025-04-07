@@ -35,7 +35,7 @@ func (t *taskRepo) GetTask(ctx context.Context, arg domain.GetTaskParam) (*domai
 	const query = `SELECT * FROM task WHERE id = $1`
 	row := t.db.QueryRowContext(ctx, query, arg.ID)
 	var task domain.Task
-	if err := row.Scan(&task.ID, &task.Title, &task.Description); err != nil {
+	if err := row.Scan(&task.ID, &task.Title, &task.Description, &task.CreatedAt, &task.UpdateAt, &task.LimitedAt, &task.IsEnd); err != nil {
 		return nil, err
 	}
 	return &task, nil
@@ -51,7 +51,7 @@ func (t *taskRepo) ListTask(ctx context.Context, arg domain.ListTaskParam) ([]do
 	var tasks []domain.Task
 	for rows.Next() {
 		var task domain.Task
-		if err := rows.Scan(&task.ID, &task.Title, &task.Description); err != nil {
+		if err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.CreatedAt, &task.UpdateAt, &task.LimitedAt, &task.IsEnd); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
