@@ -4,7 +4,7 @@ option go_package = "internal/grpc/v1";
 // import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-package task_controller.proto.v1;
+package task_controller.v1;
 
 // The task service definition.
 service TaskService {
@@ -45,7 +45,7 @@ message CreateTaskRequest {
   string title = 1;
   string description = 2;
   google.protobuf.Timestamp limited_at = 3;
-  repeated Tag tag_ids = 4;
+  repeated string tag_ids = 4;
 }
 
 message CreateTaskResponse {
