@@ -11,12 +11,15 @@ import (
 
 type taskService struct {
 	task.UnimplementedTaskServiceServer
-	taskRepo infra.TaskRepo
+	// tx infra
+	taskRepo    infra.TaskRepo
+	taskTagRepo infra.TaskTagRepo
 }
 
-func NewTaskService(taskRepo infra.TaskRepo) task.TaskServiceServer {
+func NewTaskService(taskRepo infra.TaskRepo, taskTagRepo infra.TaskTagRepo) task.TaskServiceServer {
 	return &taskService{
-		taskRepo: taskRepo,
+		taskRepo:    taskRepo,
+		taskTagRepo: taskTagRepo,
 	}
 }
 
@@ -34,6 +37,16 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 
 	if err := t.taskRepo.CreateTask(ctx, param); err != nil {
 		return nil, err
+	}
+
+	for _, tagID := range req.TagIds {
+		taskTagParam := domain.CreateTaskTagParam{
+			TaskID: param.ID,
+			TagID:  tagID,
+		}
+		if err := t.taskTagRepo.CreateTaskTag(ctx, taskTagParam); err != nil {
+			return nil, err
+		}
 	}
 
 	return &task.CreateTaskResponse{
