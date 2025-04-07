@@ -9,6 +9,8 @@ import (
 	"github.com/sikigasa/task-controller/internal/infra"
 	postgres "github.com/sikigasa/task-controller/internal/infra/driver"
 	task "github.com/sikigasa/task-controller/proto/v1"
+	v1 "github.com/sikigasa/task-controller/proto/v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type taskService struct {
@@ -74,12 +76,28 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		return nil, err
 	}
 
+	taskTags, err := t.taskTagRepo.GetTaskTags(ctx, domain.GetTaskTagParam{TaskID: taskDetail.ID})
+	if err != nil {
+		return nil, err
+	}
+	var protoTags []*v1.Tag
+	for _, tag := range taskTags {
+		protoTags = append(protoTags, &v1.Tag{
+			Id:   tag.ID,
+			Name: tag.Name,
+		})
+	}
+
 	return &task.GetTaskResponse{
 		Task: &task.Task{
 			Id:          taskDetail.ID,
 			Title:       taskDetail.Title,
 			Description: taskDetail.Description,
+			CreatedAt:   timestamppb.New(taskDetail.CreatedAt),
+			UpdatedAt:   timestamppb.New(taskDetail.UpdateAt),
+			LimitedAt:   timestamppb.New(taskDetail.LimitedAt),
 			IsEnd:       taskDetail.IsEnd,
+			Tags:        protoTags,
 		},
 	}, nil
 }
@@ -97,11 +115,27 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 
 	var taskList []*task.Task
 	for _, taskDetail := range tasks {
+		taskTags, err := t.taskTagRepo.GetTaskTags(ctx, domain.GetTaskTagParam{TaskID: taskDetail.ID})
+		if err != nil {
+			return nil, err
+		}
+		var protoTags []*v1.Tag
+		for _, tag := range taskTags {
+			protoTags = append(protoTags, &v1.Tag{
+				Id:   tag.ID,
+				Name: tag.Name,
+			})
+		}
+
 		taskList = append(taskList, &task.Task{
 			Id:          taskDetail.ID,
 			Title:       taskDetail.Title,
 			Description: taskDetail.Description,
+			CreatedAt:   timestamppb.New(taskDetail.CreatedAt),
+			UpdatedAt:   timestamppb.New(taskDetail.UpdateAt),
+			LimitedAt:   timestamppb.New(taskDetail.LimitedAt),
 			IsEnd:       taskDetail.IsEnd,
+			Tags:        protoTags,
 		})
 	}
 
