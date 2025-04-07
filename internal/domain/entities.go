@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type Task struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
@@ -7,9 +9,9 @@ type Task struct {
 
 	IsEnd bool `json:"is_end"`
 
-	CreatedAt string `json:"created_at"`
-	UpdateAt  string `json:"updated_at"`
-	LimitedAt string `json:"limited_at"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdateAt  time.Time `json:"updated_at"`
+	LimitedAt time.Time `json:"limited_at"`
 }
 
 type Tag struct {
