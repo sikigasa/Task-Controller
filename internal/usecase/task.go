@@ -16,13 +16,15 @@ import (
 type taskService struct {
 	task.UnimplementedTaskServiceServer
 	taskRepo    infra.TaskRepo
+	tagRepo     infra.TagRepo
 	taskTagRepo infra.TaskTagRepo
 	tx          postgres.Transaction
 }
 
-func NewTaskService(taskRepo infra.TaskRepo, taskTagRepo infra.TaskTagRepo, tx postgres.Transaction) task.TaskServiceServer {
+func NewTaskService(taskRepo infra.TaskRepo, tagRepo infra.TagRepo, taskTagRepo infra.TaskTagRepo, tx postgres.Transaction) task.TaskServiceServer {
 	return &taskService{
 		taskRepo:    taskRepo,
+		tagRepo:     tagRepo,
 		taskTagRepo: taskTagRepo,
 		tx:          tx,
 	}
@@ -76,12 +78,16 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		return nil, err
 	}
 
-	taskTags, err := t.taskTagRepo.GetTaskTags(ctx, domain.GetTaskTagParam{TaskID: taskDetail.ID})
+	taskTagIDs, err := t.taskTagRepo.GetTaskTagIDs(ctx, domain.GetTaskTagParam{TaskID: taskDetail.ID})
 	if err != nil {
 		return nil, err
 	}
 	var protoTags []*v1.Tag
-	for _, tag := range taskTags {
+	for _, tagID := range taskTagIDs {
+		tag, err := t.tagRepo.GetTag(ctx, domain.GetTagParam{ID: tagID.TagID})
+		if err != nil {
+			return nil, err
+		}
 		protoTags = append(protoTags, &v1.Tag{
 			Id:   tag.ID,
 			Name: tag.Name,
@@ -115,12 +121,16 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 
 	var taskList []*task.Task
 	for _, taskDetail := range tasks {
-		taskTags, err := t.taskTagRepo.GetTaskTags(ctx, domain.GetTaskTagParam{TaskID: taskDetail.ID})
+		taskTagIDs, err := t.taskTagRepo.GetTaskTagIDs(ctx, domain.GetTaskTagParam{TaskID: taskDetail.ID})
 		if err != nil {
 			return nil, err
 		}
 		var protoTags []*v1.Tag
-		for _, tag := range taskTags {
+		for _, tagID := range taskTagIDs {
+			tag, err := t.tagRepo.GetTag(ctx, domain.GetTagParam{ID: tagID.TagID})
+			if err != nil {
+				return nil, err
+			}
 			protoTags = append(protoTags, &v1.Tag{
 				Id:   tag.ID,
 				Name: tag.Name,
