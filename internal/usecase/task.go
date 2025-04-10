@@ -156,11 +156,16 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 }
 
 func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskRequest) (*task.UpdateTaskResponse, error) {
+	if req.TagIds == nil {
+		req.TagIds = []string{}
+	}
 	err := t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
 		param := domain.UpdateTaskParam{
 			ID:          req.Id,
 			Title:       req.Title,
 			Description: req.Description,
+			LimitedAt:   req.LimitedAt.AsTime(),
+			IsEnd:       req.IsEnd,
 		}
 		if err := t.taskRepo.UpdateTask(ctx, param); err != nil {
 			return err
@@ -183,7 +188,15 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 		return nil, err
 	}
 
-	return &task.UpdateTaskResponse{}, nil
+	return &task.UpdateTaskResponse{
+		Task: &task.Task{
+			Id:          req.Id,
+			Title:       req.Title,
+			Description: req.Description,
+			LimitedAt:   req.LimitedAt,
+			IsEnd:       req.IsEnd,
+		},
+	}, nil
 }
 
 func (t *taskService) DeleteTask(ctx context.Context, req *task.DeleteTaskRequest) (*task.DeleteTaskResponse, error) {
