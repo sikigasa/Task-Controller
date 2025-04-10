@@ -41,6 +41,7 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 			ID:          uuid.String(),
 			Title:       req.Title,
 			Description: req.Description,
+			LimitedAt:   req.LimitedAt.AsTime(),
 			IsEnd:       false,
 		}
 
