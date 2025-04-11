@@ -4,7 +4,7 @@ import "time"
 
 type Task struct {
 	ID          string `json:"id"`
-	Title       string `json:"title"`
+	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`
 
 	IsEnd bool `json:"is_end"`
