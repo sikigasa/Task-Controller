@@ -200,13 +200,7 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 	}
 
 	return &task.UpdateTaskResponse{
-		Task: &task.Task{
-			Id:          req.Id,
-			Title:       req.Title,
-			Description: req.Description,
-			LimitedAt:   req.LimitedAt,
-			IsEnd:       req.IsEnd,
-		},
+		Success: true,
 	}, nil
 }
 
