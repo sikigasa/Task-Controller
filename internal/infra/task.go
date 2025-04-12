@@ -70,7 +70,7 @@ func (t *taskRepo) UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) e
 }
 
 func (t *taskRepo) DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error {
-	const query = `UPDATE task SET is_deleted = TRUE WHERE id = $1`
+	const query = `DELETE FROM task WHERE id = $1`
 	row, err := t.db.ExecContext(ctx, query, arg.ID)
 	if err != nil {
 		return err
