@@ -110,6 +110,9 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 }
 
 func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (*task.ListTaskResponse, error) {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
 	param := domain.ListTaskParam{
 		Limit:  req.Limit,
 		Offset: req.Offset,
