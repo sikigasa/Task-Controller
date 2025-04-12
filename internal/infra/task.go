@@ -64,8 +64,8 @@ func (t *taskRepo) ListTask(ctx context.Context, arg domain.ListTaskParam) ([]do
 }
 
 func (t *taskRepo) UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error {
-	const query = `UPDATE task SET title = $1, description = $2 LIMITED_AT = $3, is_end = $4 WHERE id = $5`
-	row := t.db.QueryRowContext(ctx, query, arg.Title, arg.Description, arg.ID, arg.LimitedAt, arg.IsEnd)
+	const query = `UPDATE task SET title = $1, description = $2, limited_at = $3, is_end = $4 WHERE id = $5`
+	row := t.db.QueryRowContext(ctx, query, arg.Title, arg.Description, arg.LimitedAt, arg.IsEnd, arg.ID)
 	return row.Err()
 }
 
