@@ -72,5 +72,7 @@ func (t *TagService) DeleteTag(ctx context.Context, req *tag.DeleteTagRequest) (
 		return nil, err
 	}
 
-	return &tag.DeleteTagResponse{}, nil
+	return &tag.DeleteTagResponse{
+		Success: true,
+	}, nil
 }
