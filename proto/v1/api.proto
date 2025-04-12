@@ -75,7 +75,7 @@ message UpdateTaskRequest {
 }
 
 message UpdateTaskResponse {
-  Task task = 1;
+  bool success = 1;
 }
 
 message DeleteTaskRequest {

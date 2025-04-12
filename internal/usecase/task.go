@@ -48,6 +48,10 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 		if err := t.taskRepo.CreateTask(ctx, param); err != nil {
 			return err
 		}
+
+		if req.TagIds[0] == "" {
+			return nil
+		}
 		for _, tagID := range req.TagIds {
 			taskTagParam := domain.CreateTaskTagParam{
 				TaskID: param.ID,
@@ -110,6 +114,9 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 }
 
 func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (*task.ListTaskResponse, error) {
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
 	param := domain.ListTaskParam{
 		Limit:  req.Limit,
 		Offset: req.Offset,
@@ -173,6 +180,10 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 		if err := t.taskTagRepo.DeleteTaskTags(ctx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
 			return err
 		}
+
+		if req.TagIds[0] == "" {
+			return nil
+		}
 		for _, tagID := range req.TagIds {
 			taskTagParam := domain.CreateTaskTagParam{
 				TaskID: param.ID,
@@ -189,13 +200,7 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 	}
 
 	return &task.UpdateTaskResponse{
-		Task: &task.Task{
-			Id:          req.Id,
-			Title:       req.Title,
-			Description: req.Description,
-			LimitedAt:   req.LimitedAt,
-			IsEnd:       req.IsEnd,
-		},
+		Success: true,
 	}, nil
 }
 
@@ -218,5 +223,7 @@ func (t *taskService) DeleteTask(ctx context.Context, req *task.DeleteTaskReques
 		return nil, err
 	}
 
-	return &task.DeleteTaskResponse{}, nil
+	return &task.DeleteTaskResponse{
+		Success: true,
+	}, nil
 }
