@@ -9,10 +9,11 @@ import (
 )
 
 func TestTask(t *testing.T) {
-
+	t.Run("CreateTask", testCreateTask)
 }
 
-func testCreateTask() {
+func testCreateTask(t *testing.T) {
+
 	t.Run("正常系", func(t *testing.T) {
 
 		req := &task.CreateTaskRequest{
