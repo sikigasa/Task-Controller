@@ -12,23 +12,23 @@ type taskRepo struct {
 }
 
 type TaskRepo interface {
-	CreateTask(ctx context.Context, arg domain.CreateTaskParam) error
+	CreateTask(ctx context.Context, tx *sql.Tx, arg domain.CreateTaskParam) error
 	GetTask(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error)
 	ListTask(ctx context.Context, arg domain.ListTaskParam) ([]domain.Task, error)
-	UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error
-	DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error
+	UpdateTask(ctx context.Context, tx *sql.Tx, arg domain.UpdateTaskParam) error
+	DeleteTask(ctx context.Context, tx *sql.Tx, arg domain.DeleteTaskParam) error
 }
 
 func NewTaskRepo(db *sql.DB) TaskRepo {
 	return &taskRepo{db: db}
 }
 
-func (t *taskRepo) CreateTask(ctx context.Context, arg domain.CreateTaskParam) error {
+func (t *taskRepo) CreateTask(ctx context.Context, tx *sql.Tx, arg domain.CreateTaskParam) error {
 	const query = `INSERT INTO task (id, title, description, limited_at, is_end) VALUES ($1,$2,$3,$4,$5)`
 
-	row := t.db.QueryRowContext(ctx, query, arg.ID, arg.Title, arg.Description, arg.LimitedAt, arg.IsEnd)
+	_, err := tx.ExecContext(ctx, query, arg.ID, arg.Title, arg.Description, arg.LimitedAt, arg.IsEnd)
 
-	return row.Err()
+	return err
 }
 
 func (t *taskRepo) GetTask(ctx context.Context, arg domain.GetTaskParam) (*domain.Task, error) {
@@ -63,13 +63,13 @@ func (t *taskRepo) ListTask(ctx context.Context, arg domain.ListTaskParam) ([]do
 
 }
 
-func (t *taskRepo) UpdateTask(ctx context.Context, arg domain.UpdateTaskParam) error {
+func (t *taskRepo) UpdateTask(ctx context.Context, tx *sql.Tx, arg domain.UpdateTaskParam) error {
 	const query = `UPDATE task SET title = $1, description = $2, limited_at = $3, is_end = $4 WHERE id = $5`
-	row := t.db.QueryRowContext(ctx, query, arg.Title, arg.Description, arg.LimitedAt, arg.IsEnd, arg.ID)
-	return row.Err()
+	_, err := tx.ExecContext(ctx, query, arg.Title, arg.Description, arg.LimitedAt, arg.IsEnd, arg.ID)
+	return err
 }
 
-func (t *taskRepo) DeleteTask(ctx context.Context, arg domain.DeleteTaskParam) error {
+func (t *taskRepo) DeleteTask(ctx context.Context, tx *sql.Tx, arg domain.DeleteTaskParam) error {
 	const query = `DELETE FROM task WHERE id = $1`
 	row, err := t.db.ExecContext(ctx, query, arg.ID)
 	if err != nil {
