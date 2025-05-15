@@ -9,7 +9,6 @@ import (
 	"github.com/sikigasa/task-controller/internal/infra"
 	postgres "github.com/sikigasa/task-controller/internal/infra/driver"
 	task "github.com/sikigasa/task-controller/proto/v1"
-	v1 "github.com/sikigasa/task-controller/proto/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -87,13 +86,13 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 	if err != nil {
 		return nil, err
 	}
-	var protoTags []*v1.Tag
+	var protoTags []*task.Tag
 	for _, tagID := range taskTagIDs {
 		tag, err := t.tagRepo.GetTag(ctx, domain.GetTagParam{ID: tagID.TagID})
 		if err != nil {
 			return nil, err
 		}
-		protoTags = append(protoTags, &v1.Tag{
+		protoTags = append(protoTags, &task.Tag{
 			Id:   tag.ID,
 			Name: tag.Name,
 		})
@@ -133,13 +132,13 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 		if err != nil {
 			return nil, err
 		}
-		var protoTags []*v1.Tag
+		var protoTags []*task.Tag
 		for _, tagID := range taskTagIDs {
 			tag, err := t.tagRepo.GetTag(ctx, domain.GetTagParam{ID: tagID.TagID})
 			if err != nil {
 				return nil, err
 			}
-			protoTags = append(protoTags, &v1.Tag{
+			protoTags = append(protoTags, &task.Tag{
 				Id:   tag.ID,
 				Name: tag.Name,
 			})
