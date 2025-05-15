@@ -24,9 +24,9 @@ func NewTaskTagRepo(db *sql.DB) TaskTagRepo {
 func (t *taskTagRepo) CreateTaskTag(ctx context.Context, tx *sql.Tx, arg domain.CreateTaskTagParam) error {
 	const query = `INSERT INTO task_tag (task_id, tag_id) VALUES ($1,$2)`
 
-	row := t.db.QueryRowContext(ctx, query, arg.TaskID, arg.TagID)
+	_, err := tx.ExecContext(ctx, query, arg.TaskID, arg.TagID)
 
-	return row.Err()
+	return err
 }
 
 func (t *taskTagRepo) GetTaskTagIDs(ctx context.Context, arg domain.GetTaskTagParam) ([]domain.TaskTag, error) {
@@ -51,7 +51,7 @@ func (t *taskTagRepo) GetTaskTagIDs(ctx context.Context, arg domain.GetTaskTagPa
 
 func (t *taskTagRepo) DeleteTaskTags(ctx context.Context, tx *sql.Tx, arg domain.DeleteTaskTagParam) error {
 	const query = `DELETE FROM task_tag WHERE task_id = $1`
-	row := t.db.QueryRowContext(ctx, query, arg.TaskID)
+	_, err := tx.ExecContext(ctx, query, arg.TaskID)
 
-	return row.Err()
+	return err
 }
