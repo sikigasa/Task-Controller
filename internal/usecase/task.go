@@ -45,7 +45,7 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 			IsEnd:       false,
 		}
 
-		if err := t.taskRepo.CreateTask(ctx, param); err != nil {
+		if err := t.taskRepo.CreateTask(ctx, tx, param); err != nil {
 			return err
 		}
 
@@ -57,7 +57,7 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 				TaskID: param.ID,
 				TagID:  tagID,
 			}
-			if err := t.taskTagRepo.CreateTaskTag(ctx, taskTagParam); err != nil {
+			if err := t.taskTagRepo.CreateTaskTag(ctx, tx, taskTagParam); err != nil {
 				return err
 			}
 		}
@@ -174,10 +174,10 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 			LimitedAt:   req.LimitedAt.AsTime(),
 			IsEnd:       req.IsEnd,
 		}
-		if err := t.taskRepo.UpdateTask(ctx, param); err != nil {
+		if err := t.taskRepo.UpdateTask(ctx, tx, param); err != nil {
 			return err
 		}
-		if err := t.taskTagRepo.DeleteTaskTags(ctx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
+		if err := t.taskTagRepo.DeleteTaskTags(ctx, tx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
 			return err
 		}
 
@@ -189,7 +189,7 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 				TaskID: param.ID,
 				TagID:  tagID,
 			}
-			if err := t.taskTagRepo.CreateTaskTag(ctx, taskTagParam); err != nil {
+			if err := t.taskTagRepo.CreateTaskTag(ctx, tx, taskTagParam); err != nil {
 				return err
 			}
 		}
@@ -206,14 +206,14 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 
 func (t *taskService) DeleteTask(ctx context.Context, req *task.DeleteTaskRequest) (*task.DeleteTaskResponse, error) {
 	err := t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
-		if err := t.taskTagRepo.DeleteTaskTags(ctx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
+		if err := t.taskTagRepo.DeleteTaskTags(ctx, tx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
 			return err
 		}
 
 		param := domain.DeleteTaskParam{
 			ID: req.Id,
 		}
-		if err := t.taskRepo.DeleteTask(ctx, param); err != nil {
+		if err := t.taskRepo.DeleteTask(ctx, tx, param); err != nil {
 			return err
 		}
 
