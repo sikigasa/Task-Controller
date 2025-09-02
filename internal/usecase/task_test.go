@@ -156,13 +156,14 @@ func testCreateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			TagIds:      []string{"tag1", "tag2"},
 		}
 
-		// 		res, err := taskService.CreateTask(context.Background(), req)
-		// 		if err != nil {
-		// 			t.Errorf("expected no error, got %v", err)
-		// 		}
+		res, err := taskService.CreateTask(context.Background(), req)
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
 
 		if res == nil {
 			t.Errorf("expected response, got nil")
+			return
 		}
 
 		if res.Id == "" {
@@ -274,6 +275,7 @@ func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) 
 
 		if res == nil {
 			t.Errorf("expected response, got nil")
+			return
 		}
 
 		if len(res.Tasks) == 0 {

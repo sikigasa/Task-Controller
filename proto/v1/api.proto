@@ -4,7 +4,7 @@ option go_package = "internal/grpc/v1";
 // import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-package task_controller.proto.v1;
+package proto.v1;
 
 // The task service definition.
 service TaskService {
