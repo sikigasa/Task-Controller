@@ -1,4 +1,4 @@
-.PHONY: genswag genproto run gomigrate migrateup migratedown
+.PHONY: genswag genproto run gomigrate migrateup migratedown goupdate
 
 run:
 	go run cmd/app/main.go
@@ -17,3 +17,7 @@ migrateup:
 
 migratedown:
 	migrate --path db/migrations --database 'postgresql://root:password@localhost:5432/task?sslmode=disable' -verbose down
+
+goupdate:
+	go get -t -u ./...
+	go mod tidy
