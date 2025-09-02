@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"fmt"
 )
 
 type Transaction interface {
@@ -25,7 +26,7 @@ func (p *PostgresTransaction) WithTransaction(ctx context.Context, fn func(tx *s
 
 	if err := fn(tx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
-			return rbErr
+			return fmt.Errorf("transaction error: %v, rollback error: %v", err, rbErr)
 		}
 		return err
 	}

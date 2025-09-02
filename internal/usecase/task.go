@@ -48,7 +48,7 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 			return err
 		}
 
-		if req.TagIds[0] == "" {
+		if len(req.TagIds) == 0 || req.TagIds[0] == "" {
 			return nil
 		}
 		for _, tagID := range req.TagIds {
@@ -180,7 +180,7 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 			return err
 		}
 
-		if req.TagIds[0] == "" {
+		if len(req.TagIds) == 0 || req.TagIds[0] == "" {
 			return nil
 		}
 		for _, tagID := range req.TagIds {
