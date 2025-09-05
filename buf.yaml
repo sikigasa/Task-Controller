@@ -1,9 +1,10 @@
 # For details on buf.yaml configuration, visit https://buf.build/docs/configuration/v2/buf-yaml
 version: v2
-plugins:
-  - local: protoc-gen-go
-    out: gen
-    opt: paths=source_relative
-  - local: protoc-gen-connect-go
-    out: gen
-    opt: paths=source_relative
+modules:
+  - path: proto/v1
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE
