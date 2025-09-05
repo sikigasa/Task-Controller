@@ -1,4 +1,4 @@
-package usecase
+package usecase_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/sikigasa/task-controller/internal/infra"
 	postgresDriver "github.com/sikigasa/task-controller/internal/infra/driver"
+	"github.com/sikigasa/task-controller/internal/usecase"
 	task "github.com/sikigasa/task-controller/proto/v1"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -104,8 +105,7 @@ func setupTestService(t *testing.T, db *sql.DB) task.TaskServiceServer {
 	tagRepo := infra.NewTagRepo(db)
 	taskTagRepo := infra.NewTaskTagRepo(db)
 	tx := postgresDriver.NewPostgresTransaction(db)
-
-	return NewTaskService(taskRepo, tagRepo, taskTagRepo, tx)
+	return usecase.NewTaskService(taskRepo, tagRepo, taskTagRepo, tx)
 }
 
 func createTestTag(t *testing.T, db *sql.DB, id, name string) {
