@@ -23,7 +23,7 @@ func setupTestDB(t *testing.T) (*sql.DB, func()) {
 
 	// PostgreSQLコンテナの起動
 	postgresContainer, err := postgres.Run(ctx,
-		"postgres:15-alpine",
+		"postgres:17.5-alpine",
 		postgres.WithDatabase("test_db"),
 		postgres.WithUsername("test_user"),
 		postgres.WithPassword("test_password"),
