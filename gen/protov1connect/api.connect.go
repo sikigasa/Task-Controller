@@ -2,13 +2,13 @@
 //
 // Source: api.proto
 
-package v1connect
+package protov1connect
 
 import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "internal/grpc/v1"
+	gen "github.com/sikigasa/task-controller/gen"
 	http "net/http"
 	strings "strings"
 )
@@ -56,15 +56,15 @@ const (
 // TaskServiceClient is a client for the proto.v1.TaskService service.
 type TaskServiceClient interface {
 	// Create a new task.
-	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
+	CreateTask(context.Context, *connect.Request[gen.CreateTaskRequest]) (*connect.Response[gen.CreateTaskResponse], error)
 	// Read a task by ID.
-	GetTask(context.Context, *connect.Request[v1.GetTaskRequest]) (*connect.Response[v1.GetTaskResponse], error)
+	GetTask(context.Context, *connect.Request[gen.GetTaskRequest]) (*connect.Response[gen.GetTaskResponse], error)
 	// List all tasks optional limit and offset.
-	ListTask(context.Context, *connect.Request[v1.ListTaskRequest]) (*connect.Response[v1.ListTaskResponse], error)
+	ListTask(context.Context, *connect.Request[gen.ListTaskRequest]) (*connect.Response[gen.ListTaskResponse], error)
 	// Update an existing task.
-	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
+	UpdateTask(context.Context, *connect.Request[gen.UpdateTaskRequest]) (*connect.Response[gen.UpdateTaskResponse], error)
 	// Delete a task by ID.
-	DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error)
+	DeleteTask(context.Context, *connect.Request[gen.DeleteTaskRequest]) (*connect.Response[gen.DeleteTaskResponse], error)
 }
 
 // NewTaskServiceClient constructs a client for the proto.v1.TaskService service. By default, it
@@ -76,33 +76,33 @@ type TaskServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TaskServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	taskServiceMethods := v1.File_api_proto.Services().ByName("TaskService").Methods()
+	taskServiceMethods := gen.File_api_proto.Services().ByName("TaskService").Methods()
 	return &taskServiceClient{
-		createTask: connect.NewClient[v1.CreateTaskRequest, v1.CreateTaskResponse](
+		createTask: connect.NewClient[gen.CreateTaskRequest, gen.CreateTaskResponse](
 			httpClient,
 			baseURL+TaskServiceCreateTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("CreateTask")),
 			connect.WithClientOptions(opts...),
 		),
-		getTask: connect.NewClient[v1.GetTaskRequest, v1.GetTaskResponse](
+		getTask: connect.NewClient[gen.GetTaskRequest, gen.GetTaskResponse](
 			httpClient,
 			baseURL+TaskServiceGetTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("GetTask")),
 			connect.WithClientOptions(opts...),
 		),
-		listTask: connect.NewClient[v1.ListTaskRequest, v1.ListTaskResponse](
+		listTask: connect.NewClient[gen.ListTaskRequest, gen.ListTaskResponse](
 			httpClient,
 			baseURL+TaskServiceListTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("ListTask")),
 			connect.WithClientOptions(opts...),
 		),
-		updateTask: connect.NewClient[v1.UpdateTaskRequest, v1.UpdateTaskResponse](
+		updateTask: connect.NewClient[gen.UpdateTaskRequest, gen.UpdateTaskResponse](
 			httpClient,
 			baseURL+TaskServiceUpdateTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("UpdateTask")),
 			connect.WithClientOptions(opts...),
 		),
-		deleteTask: connect.NewClient[v1.DeleteTaskRequest, v1.DeleteTaskResponse](
+		deleteTask: connect.NewClient[gen.DeleteTaskRequest, gen.DeleteTaskResponse](
 			httpClient,
 			baseURL+TaskServiceDeleteTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("DeleteTask")),
@@ -113,50 +113,50 @@ func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 
 // taskServiceClient implements TaskServiceClient.
 type taskServiceClient struct {
-	createTask *connect.Client[v1.CreateTaskRequest, v1.CreateTaskResponse]
-	getTask    *connect.Client[v1.GetTaskRequest, v1.GetTaskResponse]
-	listTask   *connect.Client[v1.ListTaskRequest, v1.ListTaskResponse]
-	updateTask *connect.Client[v1.UpdateTaskRequest, v1.UpdateTaskResponse]
-	deleteTask *connect.Client[v1.DeleteTaskRequest, v1.DeleteTaskResponse]
+	createTask *connect.Client[gen.CreateTaskRequest, gen.CreateTaskResponse]
+	getTask    *connect.Client[gen.GetTaskRequest, gen.GetTaskResponse]
+	listTask   *connect.Client[gen.ListTaskRequest, gen.ListTaskResponse]
+	updateTask *connect.Client[gen.UpdateTaskRequest, gen.UpdateTaskResponse]
+	deleteTask *connect.Client[gen.DeleteTaskRequest, gen.DeleteTaskResponse]
 }
 
 // CreateTask calls proto.v1.TaskService.CreateTask.
-func (c *taskServiceClient) CreateTask(ctx context.Context, req *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error) {
+func (c *taskServiceClient) CreateTask(ctx context.Context, req *connect.Request[gen.CreateTaskRequest]) (*connect.Response[gen.CreateTaskResponse], error) {
 	return c.createTask.CallUnary(ctx, req)
 }
 
 // GetTask calls proto.v1.TaskService.GetTask.
-func (c *taskServiceClient) GetTask(ctx context.Context, req *connect.Request[v1.GetTaskRequest]) (*connect.Response[v1.GetTaskResponse], error) {
+func (c *taskServiceClient) GetTask(ctx context.Context, req *connect.Request[gen.GetTaskRequest]) (*connect.Response[gen.GetTaskResponse], error) {
 	return c.getTask.CallUnary(ctx, req)
 }
 
 // ListTask calls proto.v1.TaskService.ListTask.
-func (c *taskServiceClient) ListTask(ctx context.Context, req *connect.Request[v1.ListTaskRequest]) (*connect.Response[v1.ListTaskResponse], error) {
+func (c *taskServiceClient) ListTask(ctx context.Context, req *connect.Request[gen.ListTaskRequest]) (*connect.Response[gen.ListTaskResponse], error) {
 	return c.listTask.CallUnary(ctx, req)
 }
 
 // UpdateTask calls proto.v1.TaskService.UpdateTask.
-func (c *taskServiceClient) UpdateTask(ctx context.Context, req *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error) {
+func (c *taskServiceClient) UpdateTask(ctx context.Context, req *connect.Request[gen.UpdateTaskRequest]) (*connect.Response[gen.UpdateTaskResponse], error) {
 	return c.updateTask.CallUnary(ctx, req)
 }
 
 // DeleteTask calls proto.v1.TaskService.DeleteTask.
-func (c *taskServiceClient) DeleteTask(ctx context.Context, req *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error) {
+func (c *taskServiceClient) DeleteTask(ctx context.Context, req *connect.Request[gen.DeleteTaskRequest]) (*connect.Response[gen.DeleteTaskResponse], error) {
 	return c.deleteTask.CallUnary(ctx, req)
 }
 
 // TaskServiceHandler is an implementation of the proto.v1.TaskService service.
 type TaskServiceHandler interface {
 	// Create a new task.
-	CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error)
+	CreateTask(context.Context, *connect.Request[gen.CreateTaskRequest]) (*connect.Response[gen.CreateTaskResponse], error)
 	// Read a task by ID.
-	GetTask(context.Context, *connect.Request[v1.GetTaskRequest]) (*connect.Response[v1.GetTaskResponse], error)
+	GetTask(context.Context, *connect.Request[gen.GetTaskRequest]) (*connect.Response[gen.GetTaskResponse], error)
 	// List all tasks optional limit and offset.
-	ListTask(context.Context, *connect.Request[v1.ListTaskRequest]) (*connect.Response[v1.ListTaskResponse], error)
+	ListTask(context.Context, *connect.Request[gen.ListTaskRequest]) (*connect.Response[gen.ListTaskResponse], error)
 	// Update an existing task.
-	UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error)
+	UpdateTask(context.Context, *connect.Request[gen.UpdateTaskRequest]) (*connect.Response[gen.UpdateTaskResponse], error)
 	// Delete a task by ID.
-	DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error)
+	DeleteTask(context.Context, *connect.Request[gen.DeleteTaskRequest]) (*connect.Response[gen.DeleteTaskResponse], error)
 }
 
 // NewTaskServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -165,7 +165,7 @@ type TaskServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	taskServiceMethods := v1.File_api_proto.Services().ByName("TaskService").Methods()
+	taskServiceMethods := gen.File_api_proto.Services().ByName("TaskService").Methods()
 	taskServiceCreateTaskHandler := connect.NewUnaryHandler(
 		TaskServiceCreateTaskProcedure,
 		svc.CreateTask,
@@ -217,34 +217,34 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 // UnimplementedTaskServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTaskServiceHandler struct{}
 
-func (UnimplementedTaskServiceHandler) CreateTask(context.Context, *connect.Request[v1.CreateTaskRequest]) (*connect.Response[v1.CreateTaskResponse], error) {
+func (UnimplementedTaskServiceHandler) CreateTask(context.Context, *connect.Request[gen.CreateTaskRequest]) (*connect.Response[gen.CreateTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TaskService.CreateTask is not implemented"))
 }
 
-func (UnimplementedTaskServiceHandler) GetTask(context.Context, *connect.Request[v1.GetTaskRequest]) (*connect.Response[v1.GetTaskResponse], error) {
+func (UnimplementedTaskServiceHandler) GetTask(context.Context, *connect.Request[gen.GetTaskRequest]) (*connect.Response[gen.GetTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TaskService.GetTask is not implemented"))
 }
 
-func (UnimplementedTaskServiceHandler) ListTask(context.Context, *connect.Request[v1.ListTaskRequest]) (*connect.Response[v1.ListTaskResponse], error) {
+func (UnimplementedTaskServiceHandler) ListTask(context.Context, *connect.Request[gen.ListTaskRequest]) (*connect.Response[gen.ListTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TaskService.ListTask is not implemented"))
 }
 
-func (UnimplementedTaskServiceHandler) UpdateTask(context.Context, *connect.Request[v1.UpdateTaskRequest]) (*connect.Response[v1.UpdateTaskResponse], error) {
+func (UnimplementedTaskServiceHandler) UpdateTask(context.Context, *connect.Request[gen.UpdateTaskRequest]) (*connect.Response[gen.UpdateTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TaskService.UpdateTask is not implemented"))
 }
 
-func (UnimplementedTaskServiceHandler) DeleteTask(context.Context, *connect.Request[v1.DeleteTaskRequest]) (*connect.Response[v1.DeleteTaskResponse], error) {
+func (UnimplementedTaskServiceHandler) DeleteTask(context.Context, *connect.Request[gen.DeleteTaskRequest]) (*connect.Response[gen.DeleteTaskResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TaskService.DeleteTask is not implemented"))
 }
 
 // TagServiceClient is a client for the proto.v1.TagService service.
 type TagServiceClient interface {
 	// Create a new tag.
-	CreateTag(context.Context, *connect.Request[v1.CreateTagRequest]) (*connect.Response[v1.CreateTagResponse], error)
+	CreateTag(context.Context, *connect.Request[gen.CreateTagRequest]) (*connect.Response[gen.CreateTagResponse], error)
 	// List all tags optional limit and offset.
-	ListTag(context.Context, *connect.Request[v1.ListTagRequest]) (*connect.Response[v1.ListTagResponse], error)
+	ListTag(context.Context, *connect.Request[gen.ListTagRequest]) (*connect.Response[gen.ListTagResponse], error)
 	// Delete a tag by ID.
-	DeleteTag(context.Context, *connect.Request[v1.DeleteTagRequest]) (*connect.Response[v1.DeleteTagResponse], error)
+	DeleteTag(context.Context, *connect.Request[gen.DeleteTagRequest]) (*connect.Response[gen.DeleteTagResponse], error)
 }
 
 // NewTagServiceClient constructs a client for the proto.v1.TagService service. By default, it uses
@@ -256,21 +256,21 @@ type TagServiceClient interface {
 // http://api.acme.com or https://acme.com/grpc).
 func NewTagServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) TagServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
-	tagServiceMethods := v1.File_api_proto.Services().ByName("TagService").Methods()
+	tagServiceMethods := gen.File_api_proto.Services().ByName("TagService").Methods()
 	return &tagServiceClient{
-		createTag: connect.NewClient[v1.CreateTagRequest, v1.CreateTagResponse](
+		createTag: connect.NewClient[gen.CreateTagRequest, gen.CreateTagResponse](
 			httpClient,
 			baseURL+TagServiceCreateTagProcedure,
 			connect.WithSchema(tagServiceMethods.ByName("CreateTag")),
 			connect.WithClientOptions(opts...),
 		),
-		listTag: connect.NewClient[v1.ListTagRequest, v1.ListTagResponse](
+		listTag: connect.NewClient[gen.ListTagRequest, gen.ListTagResponse](
 			httpClient,
 			baseURL+TagServiceListTagProcedure,
 			connect.WithSchema(tagServiceMethods.ByName("ListTag")),
 			connect.WithClientOptions(opts...),
 		),
-		deleteTag: connect.NewClient[v1.DeleteTagRequest, v1.DeleteTagResponse](
+		deleteTag: connect.NewClient[gen.DeleteTagRequest, gen.DeleteTagResponse](
 			httpClient,
 			baseURL+TagServiceDeleteTagProcedure,
 			connect.WithSchema(tagServiceMethods.ByName("DeleteTag")),
@@ -281,34 +281,34 @@ func NewTagServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 
 // tagServiceClient implements TagServiceClient.
 type tagServiceClient struct {
-	createTag *connect.Client[v1.CreateTagRequest, v1.CreateTagResponse]
-	listTag   *connect.Client[v1.ListTagRequest, v1.ListTagResponse]
-	deleteTag *connect.Client[v1.DeleteTagRequest, v1.DeleteTagResponse]
+	createTag *connect.Client[gen.CreateTagRequest, gen.CreateTagResponse]
+	listTag   *connect.Client[gen.ListTagRequest, gen.ListTagResponse]
+	deleteTag *connect.Client[gen.DeleteTagRequest, gen.DeleteTagResponse]
 }
 
 // CreateTag calls proto.v1.TagService.CreateTag.
-func (c *tagServiceClient) CreateTag(ctx context.Context, req *connect.Request[v1.CreateTagRequest]) (*connect.Response[v1.CreateTagResponse], error) {
+func (c *tagServiceClient) CreateTag(ctx context.Context, req *connect.Request[gen.CreateTagRequest]) (*connect.Response[gen.CreateTagResponse], error) {
 	return c.createTag.CallUnary(ctx, req)
 }
 
 // ListTag calls proto.v1.TagService.ListTag.
-func (c *tagServiceClient) ListTag(ctx context.Context, req *connect.Request[v1.ListTagRequest]) (*connect.Response[v1.ListTagResponse], error) {
+func (c *tagServiceClient) ListTag(ctx context.Context, req *connect.Request[gen.ListTagRequest]) (*connect.Response[gen.ListTagResponse], error) {
 	return c.listTag.CallUnary(ctx, req)
 }
 
 // DeleteTag calls proto.v1.TagService.DeleteTag.
-func (c *tagServiceClient) DeleteTag(ctx context.Context, req *connect.Request[v1.DeleteTagRequest]) (*connect.Response[v1.DeleteTagResponse], error) {
+func (c *tagServiceClient) DeleteTag(ctx context.Context, req *connect.Request[gen.DeleteTagRequest]) (*connect.Response[gen.DeleteTagResponse], error) {
 	return c.deleteTag.CallUnary(ctx, req)
 }
 
 // TagServiceHandler is an implementation of the proto.v1.TagService service.
 type TagServiceHandler interface {
 	// Create a new tag.
-	CreateTag(context.Context, *connect.Request[v1.CreateTagRequest]) (*connect.Response[v1.CreateTagResponse], error)
+	CreateTag(context.Context, *connect.Request[gen.CreateTagRequest]) (*connect.Response[gen.CreateTagResponse], error)
 	// List all tags optional limit and offset.
-	ListTag(context.Context, *connect.Request[v1.ListTagRequest]) (*connect.Response[v1.ListTagResponse], error)
+	ListTag(context.Context, *connect.Request[gen.ListTagRequest]) (*connect.Response[gen.ListTagResponse], error)
 	// Delete a tag by ID.
-	DeleteTag(context.Context, *connect.Request[v1.DeleteTagRequest]) (*connect.Response[v1.DeleteTagResponse], error)
+	DeleteTag(context.Context, *connect.Request[gen.DeleteTagRequest]) (*connect.Response[gen.DeleteTagResponse], error)
 }
 
 // NewTagServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -317,7 +317,7 @@ type TagServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewTagServiceHandler(svc TagServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	tagServiceMethods := v1.File_api_proto.Services().ByName("TagService").Methods()
+	tagServiceMethods := gen.File_api_proto.Services().ByName("TagService").Methods()
 	tagServiceCreateTagHandler := connect.NewUnaryHandler(
 		TagServiceCreateTagProcedure,
 		svc.CreateTag,
@@ -353,14 +353,14 @@ func NewTagServiceHandler(svc TagServiceHandler, opts ...connect.HandlerOption) 
 // UnimplementedTagServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTagServiceHandler struct{}
 
-func (UnimplementedTagServiceHandler) CreateTag(context.Context, *connect.Request[v1.CreateTagRequest]) (*connect.Response[v1.CreateTagResponse], error) {
+func (UnimplementedTagServiceHandler) CreateTag(context.Context, *connect.Request[gen.CreateTagRequest]) (*connect.Response[gen.CreateTagResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TagService.CreateTag is not implemented"))
 }
 
-func (UnimplementedTagServiceHandler) ListTag(context.Context, *connect.Request[v1.ListTagRequest]) (*connect.Response[v1.ListTagResponse], error) {
+func (UnimplementedTagServiceHandler) ListTag(context.Context, *connect.Request[gen.ListTagRequest]) (*connect.Response[gen.ListTagResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TagService.ListTag is not implemented"))
 }
 
-func (UnimplementedTagServiceHandler) DeleteTag(context.Context, *connect.Request[v1.DeleteTagRequest]) (*connect.Response[v1.DeleteTagResponse], error) {
+func (UnimplementedTagServiceHandler) DeleteTag(context.Context, *connect.Request[gen.DeleteTagRequest]) (*connect.Response[gen.DeleteTagResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("proto.v1.TagService.DeleteTag is not implemented"))
 }

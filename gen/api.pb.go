@@ -4,7 +4,7 @@
 // 	protoc        (unknown)
 // source: api.proto
 
-package v1
+package protov1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -1037,7 +1037,8 @@ const file_api_proto_rawDesc = "" +
 	"TagService\x12D\n" +
 	"\tCreateTag\x12\x1a.proto.v1.CreateTagRequest\x1a\x1b.proto.v1.CreateTagResponse\x12>\n" +
 	"\aListTag\x12\x18.proto.v1.ListTagRequest\x1a\x19.proto.v1.ListTagResponse\x12D\n" +
-	"\tDeleteTag\x12\x1a.proto.v1.DeleteTagRequest\x1a\x1b.proto.v1.DeleteTagResponseB\x12Z\x10internal/grpc/v1b\x06proto3"
+	"\tDeleteTag\x12\x1a.proto.v1.DeleteTagRequest\x1a\x1b.proto.v1.DeleteTagResponseB\x8a\x01\n" +
+	"\fcom.proto.v1B\bApiProtoP\x01Z/github.com/sikigasa/task-controller/gen;protov1\xa2\x02\x03PXX\xaa\x02\bProto.V1\xca\x02\bProto\\V1\xe2\x02\x14Proto\\V1\\GPBMetadata\xea\x02\tProto::V1b\x06proto3"
 
 var (
 	file_api_proto_rawDescOnce sync.Once
