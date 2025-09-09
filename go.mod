@@ -3,6 +3,7 @@ module github.com/sikigasa/task-controller
 go 1.24.1
 
 require (
+	connectrpc.com/connect v1.18.1
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
