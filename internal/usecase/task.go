@@ -4,23 +4,25 @@ import (
 	"context"
 	"database/sql"
 
+	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	task "github.com/sikigasa/task-controller/gen"
+	taskConnect "github.com/sikigasa/task-controller/gen/protov1connect"
 	"github.com/sikigasa/task-controller/internal/domain"
 	"github.com/sikigasa/task-controller/internal/infra"
 	postgres "github.com/sikigasa/task-controller/internal/infra/driver"
-	task "github.com/sikigasa/task-controller/proto/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type taskService struct {
-	task.UnimplementedTaskServiceServer
+	taskConnect.UnimplementedTaskServiceHandler
 	taskRepo    infra.TaskRepo
 	tagRepo     infra.TagRepo
 	taskTagRepo infra.TaskTagRepo
 	tx          postgres.Transaction
 }
 
-func NewTaskService(taskRepo infra.TaskRepo, tagRepo infra.TagRepo, taskTagRepo infra.TaskTagRepo, tx postgres.Transaction) task.TaskServiceServer {
+func NewTaskService(taskRepo infra.TaskRepo, tagRepo infra.TagRepo, taskTagRepo infra.TaskTagRepo, tx postgres.Transaction) taskConnect.TaskServiceClient {
 	return &taskService{
 		taskRepo:    taskRepo,
 		tagRepo:     tagRepo,
@@ -29,7 +31,7 @@ func NewTaskService(taskRepo infra.TaskRepo, tagRepo infra.TagRepo, taskTagRepo 
 	}
 }
 
-func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskRequest) (*task.CreateTaskResponse, error) {
+func (t *taskService) CreateTask(ctx context.Context, req *connect.Request[task.CreateTaskRequest]) (*connect.Response[task.CreateTaskResponse], error) {
 	uuid, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
@@ -38,9 +40,9 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 	err = t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
 		param := domain.CreateTaskParam{
 			ID:          uuid.String(),
-			Title:       req.Title,
-			Description: req.Description,
-			LimitedAt:   req.LimitedAt.AsTime(),
+			Title:       req.Msg.Title,
+			Description: req.Msg.Description,
+			LimitedAt:   req.Msg.LimitedAt.AsTime(),
 			IsEnd:       false,
 		}
 
@@ -48,10 +50,10 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 			return err
 		}
 
-		if len(req.TagIds) == 0 || req.TagIds[0] == "" {
+		if len(req.Msg.TagIds) == 0 || req.Msg.TagIds[0] == "" {
 			return nil
 		}
-		for _, tagID := range req.TagIds {
+		for _, tagID := range req.Msg.TagIds {
 			taskTagParam := domain.CreateTaskTagParam{
 				TaskID: param.ID,
 				TagID:  tagID,
@@ -67,14 +69,14 @@ func (t *taskService) CreateTask(ctx context.Context, req *task.CreateTaskReques
 		return nil, err
 	}
 
-	return &task.CreateTaskResponse{
+	return connect.NewResponse(&task.CreateTaskResponse{
 		Id: uuid.String(),
-	}, nil
+	}), nil
 }
 
-func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*task.GetTaskResponse, error) {
+func (t *taskService) GetTask(ctx context.Context, req *connect.Request[task.GetTaskRequest]) (*connect.Response[task.GetTaskResponse], error) {
 	param := domain.GetTaskParam{
-		ID: req.Id,
+		ID: req.Msg.Id,
 	}
 
 	taskDetail, err := t.taskRepo.GetTask(ctx, param)
@@ -98,7 +100,7 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 		})
 	}
 
-	return &task.GetTaskResponse{
+	return connect.NewResponse(&task.GetTaskResponse{
 		Task: &task.Task{
 			Id:          taskDetail.ID,
 			Title:       taskDetail.Title,
@@ -109,16 +111,16 @@ func (t *taskService) GetTask(ctx context.Context, req *task.GetTaskRequest) (*t
 			IsEnd:       taskDetail.IsEnd,
 			Tags:        protoTags,
 		},
-	}, nil
+	}), nil
 }
 
-func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (*task.ListTaskResponse, error) {
-	if req.Limit == 0 {
-		req.Limit = 10
+func (t *taskService) ListTask(ctx context.Context, req *connect.Request[task.ListTaskRequest]) (*connect.Response[task.ListTaskResponse], error) {
+	if req.Msg.Limit == 0 {
+		req.Msg.Limit = 10
 	}
 	param := domain.ListTaskParam{
-		Limit:  req.Limit,
-		Offset: req.Offset,
+		Limit:  req.Msg.Limit,
+		Offset: req.Msg.Offset,
 	}
 
 	tasks, err := t.taskRepo.ListTask(ctx, param)
@@ -156,34 +158,34 @@ func (t *taskService) ListTask(ctx context.Context, req *task.ListTaskRequest) (
 		})
 	}
 
-	return &task.ListTaskResponse{
+	return connect.NewResponse(&task.ListTaskResponse{
 		Tasks: taskList,
-	}, nil
+	}), nil
 }
 
-func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskRequest) (*task.UpdateTaskResponse, error) {
-	if req.TagIds == nil {
-		req.TagIds = []string{}
+func (t *taskService) UpdateTask(ctx context.Context, req *connect.Request[task.UpdateTaskRequest]) (*connect.Response[task.UpdateTaskResponse], error) {
+	if req.Msg.TagIds == nil {
+		req.Msg.TagIds = []string{}
 	}
 	err := t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
 		param := domain.UpdateTaskParam{
-			ID:          req.Id,
-			Title:       req.Title,
-			Description: req.Description,
-			LimitedAt:   req.LimitedAt.AsTime(),
-			IsEnd:       req.IsEnd,
+			ID:          req.Msg.Id,
+			Title:       req.Msg.Title,
+			Description: req.Msg.Description,
+			LimitedAt:   req.Msg.LimitedAt.AsTime(),
+			IsEnd:       req.Msg.IsEnd,
 		}
 		if err := t.taskRepo.UpdateTask(ctx, tx, param); err != nil {
 			return err
 		}
-		if err := t.taskTagRepo.DeleteTaskTags(ctx, tx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
+		if err := t.taskTagRepo.DeleteTaskTags(ctx, tx, domain.DeleteTaskTagParam{TaskID: req.Msg.Id}); err != nil {
 			return err
 		}
 
-		if len(req.TagIds) == 0 || req.TagIds[0] == "" {
+		if len(req.Msg.TagIds) == 0 || req.Msg.TagIds[0] == "" {
 			return nil
 		}
-		for _, tagID := range req.TagIds {
+		for _, tagID := range req.Msg.TagIds {
 			taskTagParam := domain.CreateTaskTagParam{
 				TaskID: param.ID,
 				TagID:  tagID,
@@ -198,19 +200,19 @@ func (t *taskService) UpdateTask(ctx context.Context, req *task.UpdateTaskReques
 		return nil, err
 	}
 
-	return &task.UpdateTaskResponse{
+	return connect.NewResponse(&task.UpdateTaskResponse{
 		Success: true,
-	}, nil
+	}), nil
 }
 
-func (t *taskService) DeleteTask(ctx context.Context, req *task.DeleteTaskRequest) (*task.DeleteTaskResponse, error) {
+func (t *taskService) DeleteTask(ctx context.Context, req *connect.Request[task.DeleteTaskRequest]) (*connect.Response[task.DeleteTaskResponse], error) {
 	err := t.tx.WithTransaction(ctx, func(tx *sql.Tx) error {
-		if err := t.taskTagRepo.DeleteTaskTags(ctx, tx, domain.DeleteTaskTagParam{TaskID: req.Id}); err != nil {
+		if err := t.taskTagRepo.DeleteTaskTags(ctx, tx, domain.DeleteTaskTagParam{TaskID: req.Msg.Id}); err != nil {
 			return err
 		}
 
 		param := domain.DeleteTaskParam{
-			ID: req.Id,
+			ID: req.Msg.Id,
 		}
 		if err := t.taskRepo.DeleteTask(ctx, tx, param); err != nil {
 			return err
@@ -222,7 +224,7 @@ func (t *taskService) DeleteTask(ctx context.Context, req *task.DeleteTaskReques
 		return nil, err
 	}
 
-	return &task.DeleteTaskResponse{
+	return connect.NewResponse(&task.DeleteTaskResponse{
 		Success: true,
-	}, nil
+	}), nil
 }
