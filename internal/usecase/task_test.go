@@ -133,15 +133,15 @@ func TestTask(t *testing.T) {
 	})
 
 	t.Run("ListTask", func(t *testing.T) {
-		testListTask(t, taskService, db)
+		testListTask(t, taskService)
 	})
 
 	t.Run("UpdateTask", func(t *testing.T) {
-		testUpdateTask(t, taskService, db)
+		testUpdateTask(t, taskService)
 	})
 
 	t.Run("DeleteTask", func(t *testing.T) {
-		testDeleteTask(t, taskService, db)
+		testDeleteTask(t, taskService)
 	})
 }
 
@@ -249,7 +249,7 @@ func testGetTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sq
 	})
 }
 
-func testListTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
+func testListTask(t *testing.T, taskService taskConnect.TaskServiceClient) {
 	t.Run("正常系", func(t *testing.T) {
 		// 複数のテストタスクを作成
 		for i := 0; i < 3; i++ {
@@ -298,7 +298,6 @@ func testListTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *s
 
 		if res == nil {
 			t.Errorf("expected response, got nil")
-			return
 		}
 
 		if len(res.Msg.Tasks) > 2 {
@@ -307,7 +306,7 @@ func testListTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *s
 	})
 }
 
-func testUpdateTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
+func testUpdateTask(t *testing.T, taskService taskConnect.TaskServiceClient) {
 	t.Run("正常系", func(t *testing.T) {
 		// テスト用タスクを作成
 		createReq := &task.CreateTaskRequest{
@@ -361,7 +360,7 @@ func testUpdateTask(t *testing.T, taskService taskConnect.TaskServiceClient, db 
 	})
 }
 
-func testDeleteTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
+func testDeleteTask(t *testing.T, taskService taskConnect.TaskServiceClient) {
 	t.Run("正常系", func(t *testing.T) {
 		// テスト用タスクを作成
 		createReq := &task.CreateTaskRequest{
