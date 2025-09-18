@@ -298,6 +298,7 @@ func testListTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *s
 
 		if res == nil {
 			t.Errorf("expected response, got nil")
+			return
 		}
 
 		if len(res.Msg.Tasks) > 2 {
