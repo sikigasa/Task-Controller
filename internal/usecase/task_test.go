@@ -6,11 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	task "github.com/sikigasa/task-controller/gen"
+	taskConnect "github.com/sikigasa/task-controller/gen/protov1connect"
 	"github.com/sikigasa/task-controller/internal/infra"
 	postgresDriver "github.com/sikigasa/task-controller/internal/infra/driver"
 	"github.com/sikigasa/task-controller/internal/usecase"
-	task "github.com/sikigasa/task-controller/proto/v1"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -100,7 +102,7 @@ func createTables(db *sql.DB) error {
 	return nil
 }
 
-func setupTestService(t *testing.T, db *sql.DB) task.TaskServiceServer {
+func setupTestService(t *testing.T, db *sql.DB) taskConnect.TaskServiceClient {
 	taskRepo := infra.NewTaskRepo(db)
 	tagRepo := infra.NewTagRepo(db)
 	taskTagRepo := infra.NewTaskTagRepo(db)
@@ -143,7 +145,7 @@ func TestTask(t *testing.T) {
 	})
 }
 
-func testCreateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
+func testCreateTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
 	t.Run("正常系_タグありの場合", func(t *testing.T) {
 		// テスト用タグを作成
 		createTestTag(t, db, "tag1", "テストタグ1")
@@ -156,7 +158,7 @@ func testCreateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			TagIds:      []string{"tag1", "tag2"},
 		}
 
-		res, err := taskService.CreateTask(context.Background(), req)
+		res, err := taskService.CreateTask(context.Background(), connect.NewRequest(req))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
@@ -166,13 +168,13 @@ func testCreateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			return
 		}
 
-		if res.Id == "" {
+		if res.Msg.Id == "" {
 			t.Errorf("expected non-empty ID, got empty string")
 		}
 
 		// UUIDの形式チェック
-		if _, err := uuid.Parse(res.Id); err != nil {
-			t.Errorf("expected valid UUID, got %v", res.Id)
+		if _, err := uuid.Parse(res.Msg.Id); err != nil {
+			t.Errorf("expected valid UUID, got %v", res.Msg.Id)
 		}
 	})
 
@@ -184,18 +186,18 @@ func testCreateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			TagIds:      []string{},
 		}
 
-		res, err := taskService.CreateTask(context.Background(), req)
+		res, err := taskService.CreateTask(context.Background(), connect.NewRequest(req))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
 
-		if res == nil || res.Id == "" {
+		if res == nil || res.Msg.Id == "" {
 			t.Errorf("expected valid response with ID")
 		}
 	})
 }
 
-func testGetTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
+func testGetTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
 	t.Run("正常系", func(t *testing.T) {
 		// テスト用タグとタスクを作成
 		createTestTag(t, db, "get_tag1", "取得テストタグ")
@@ -207,31 +209,31 @@ func testGetTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
 			TagIds:      []string{"get_tag1"},
 		}
 
-		createRes, err := taskService.CreateTask(context.Background(), createReq)
+		createRes, err := taskService.CreateTask(context.Background(), connect.NewRequest(createReq))
 		if err != nil {
 			t.Fatalf("failed to create task: %v", err)
 		}
 
 		// 作成したタスクを取得
 		getReq := &task.GetTaskRequest{
-			Id: createRes.Id,
+			Id: createRes.Msg.Id,
 		}
 
-		res, err := taskService.GetTask(context.Background(), getReq)
+		res, err := taskService.GetTask(context.Background(), connect.NewRequest(getReq))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
 
-		if res == nil || res.Task == nil {
+		if res == nil || res.Msg.Task == nil {
 			t.Errorf("expected task response, got nil")
 		}
 
-		if res.Task.Title != "取得テストタスク" {
-			t.Errorf("expected title '取得テストタスク', got %v", res.Task.Title)
+		if res.Msg.Task.Title != "取得テストタスク" {
+			t.Errorf("expected title '取得テストタスク', got %v", res.Msg.Task.Title)
 		}
 
-		if len(res.Task.Tags) != 1 {
-			t.Errorf("expected 1 tag, got %d", len(res.Task.Tags))
+		if len(res.Msg.Task.Tags) != 1 {
+			t.Errorf("expected 1 tag, got %d", len(res.Msg.Task.Tags))
 		}
 	})
 
@@ -240,14 +242,14 @@ func testGetTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
 			Id: "non-existent-id",
 		}
 
-		_, err := taskService.GetTask(context.Background(), getReq)
+		_, err := taskService.GetTask(context.Background(), connect.NewRequest(getReq))
 		if err == nil {
 			t.Errorf("expected error for non-existent task, got nil")
 		}
 	})
 }
 
-func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
+func testListTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
 	t.Run("正常系", func(t *testing.T) {
 		// 複数のテストタスクを作成
 		for i := 0; i < 3; i++ {
@@ -257,7 +259,7 @@ func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) 
 				LimitedAt:   timestamppb.New(time.Now().Add(24 * time.Hour)),
 				TagIds:      []string{},
 			}
-			_, err := taskService.CreateTask(context.Background(), req)
+			_, err := taskService.CreateTask(context.Background(), connect.NewRequest(req))
 			if err != nil {
 				t.Fatalf("failed to create task %d: %v", i, err)
 			}
@@ -268,7 +270,7 @@ func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) 
 			Offset: 0,
 		}
 
-		res, err := taskService.ListTask(context.Background(), req)
+		res, err := taskService.ListTask(context.Background(), connect.NewRequest(req))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
@@ -278,7 +280,7 @@ func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) 
 			return
 		}
 
-		if len(res.Tasks) == 0 {
+		if len(res.Msg.Tasks) == 0 {
 			t.Errorf("expected tasks, got empty list")
 		}
 	})
@@ -289,7 +291,7 @@ func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) 
 			Offset: 0,
 		}
 
-		res, err := taskService.ListTask(context.Background(), req)
+		res, err := taskService.ListTask(context.Background(), connect.NewRequest(req))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
@@ -298,13 +300,13 @@ func testListTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) 
 			t.Errorf("expected response, got nil")
 		}
 
-		if len(res.Tasks) > 2 {
-			t.Errorf("expected at most 2 tasks, got %d", len(res.Tasks))
+		if len(res.Msg.Tasks) > 2 {
+			t.Errorf("expected at most 2 tasks, got %d", len(res.Msg.Tasks))
 		}
 	})
 }
 
-func testUpdateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
+func testUpdateTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
 	t.Run("正常系", func(t *testing.T) {
 		// テスト用タスクを作成
 		createReq := &task.CreateTaskRequest{
@@ -314,14 +316,14 @@ func testUpdateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			TagIds:      []string{},
 		}
 
-		createRes, err := taskService.CreateTask(context.Background(), createReq)
+		createRes, err := taskService.CreateTask(context.Background(), connect.NewRequest(createReq))
 		if err != nil {
 			t.Fatalf("failed to create task: %v", err)
 		}
 
 		// タスクを更新
 		updateReq := &task.UpdateTaskRequest{
-			Id:          createRes.Id,
+			Id:          createRes.Msg.Id,
 			Title:       "更新後タスク",
 			Description: "更新後の説明",
 			LimitedAt:   timestamppb.New(time.Now().Add(48 * time.Hour)),
@@ -329,36 +331,36 @@ func testUpdateTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			TagIds:      []string{},
 		}
 
-		res, err := taskService.UpdateTask(context.Background(), updateReq)
+		res, err := taskService.UpdateTask(context.Background(), connect.NewRequest(updateReq))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
 
-		if res == nil || !res.Success {
+		if res == nil || !res.Msg.Success {
 			t.Errorf("expected successful update")
 		}
 
 		// 更新されたことを確認
 		getReq := &task.GetTaskRequest{
-			Id: createRes.Id,
+			Id: createRes.Msg.Id,
 		}
 
-		getRes, err := taskService.GetTask(context.Background(), getReq)
+		getRes, err := taskService.GetTask(context.Background(), connect.NewRequest(getReq))
 		if err != nil {
 			t.Errorf("failed to get updated task: %v", err)
 		}
 
-		if getRes.Task.Title != "更新後タスク" {
-			t.Errorf("expected updated title '更新後タスク', got %v", getRes.Task.Title)
+		if getRes.Msg.Task.Title != "更新後タスク" {
+			t.Errorf("expected updated title '更新後タスク', got %v", getRes.Msg.Task.Title)
 		}
 
-		if !getRes.Task.IsEnd {
+		if !getRes.Msg.Task.IsEnd {
 			t.Errorf("expected task to be marked as end")
 		}
 	})
 }
 
-func testDeleteTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB) {
+func testDeleteTask(t *testing.T, taskService taskConnect.TaskServiceClient, db *sql.DB) {
 	t.Run("正常系", func(t *testing.T) {
 		// テスト用タスクを作成
 		createReq := &task.CreateTaskRequest{
@@ -368,31 +370,31 @@ func testDeleteTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			TagIds:      []string{},
 		}
 
-		createRes, err := taskService.CreateTask(context.Background(), createReq)
+		createRes, err := taskService.CreateTask(context.Background(), connect.NewRequest(createReq))
 		if err != nil {
 			t.Fatalf("failed to create task: %v", err)
 		}
 
 		// タスクを削除
 		deleteReq := &task.DeleteTaskRequest{
-			Id: createRes.Id,
+			Id: createRes.Msg.Id,
 		}
 
-		res, err := taskService.DeleteTask(context.Background(), deleteReq)
+		res, err := taskService.DeleteTask(context.Background(), connect.NewRequest(deleteReq))
 		if err != nil {
 			t.Errorf("expected no error, got %v", err)
 		}
 
-		if res == nil || !res.Success {
+		if res == nil || !res.Msg.Success {
 			t.Errorf("expected successful deletion")
 		}
 
 		// 削除されたことを確認
 		getReq := &task.GetTaskRequest{
-			Id: createRes.Id,
+			Id: createRes.Msg.Id,
 		}
 
-		_, err = taskService.GetTask(context.Background(), getReq)
+		_, err = taskService.GetTask(context.Background(), connect.NewRequest(getReq))
 		if err == nil {
 			t.Errorf("expected error when getting deleted task, got nil")
 		}
@@ -403,7 +405,7 @@ func testDeleteTask(t *testing.T, taskService task.TaskServiceServer, db *sql.DB
 			Id: "non-existent-id",
 		}
 
-		_, err := taskService.DeleteTask(context.Background(), deleteReq)
+		_, err := taskService.DeleteTask(context.Background(), connect.NewRequest(deleteReq))
 		if err == nil {
 			t.Errorf("expected error when deleting non-existent task, got nil")
 		}
