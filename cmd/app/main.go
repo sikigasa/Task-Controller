@@ -22,11 +22,17 @@ func init() {
 }
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatalf("failed to run server: %v", err)
+	}
+}
+
+func run() error {
 	// 8080番portのListenerを作成
 	port := 8080
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -72,4 +78,7 @@ func main() {
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer shutdownCancel()
 	s.Shutdown(shutdownCtx)
+	log.Println("http server stopped")
+
+	return nil
 }
