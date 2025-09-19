@@ -3,46 +3,48 @@ package usecase
 import (
 	"context"
 
+	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	tag "github.com/sikigasa/task-controller/gen"
+	tagConnect "github.com/sikigasa/task-controller/gen/protov1connect"
 	"github.com/sikigasa/task-controller/internal/domain"
 	"github.com/sikigasa/task-controller/internal/infra"
-	tag "github.com/sikigasa/task-controller/proto/v1"
 )
 
 type TagService struct {
-	tag.UnimplementedTagServiceServer
+	tagConnect.UnimplementedTagServiceHandler
 	tagRepo infra.TagRepo
 }
 
-func NewTagService(tagRepo infra.TagRepo) tag.TagServiceServer {
+func NewTagService(tagRepo infra.TagRepo) tagConnect.TagServiceClient {
 	return &TagService{
 		tagRepo: tagRepo,
 	}
 }
 
-func (t *TagService) CreateTag(ctx context.Context, req *tag.CreateTagRequest) (*tag.CreateTagResponse, error) {
+func (t *TagService) CreateTag(ctx context.Context, req *connect.Request[tag.CreateTagRequest]) (*connect.Response[tag.CreateTagResponse], error) {
 	uuid, err := uuid.NewV7()
 	if err != nil {
 		return nil, err
 	}
 	param := domain.CreateTagParam{
 		ID:   uuid.String(),
-		Name: req.Name,
+		Name: req.Msg.Name,
 	}
 
 	if err := t.tagRepo.CreateTag(ctx, param); err != nil {
 		return nil, err
 	}
 
-	return &tag.CreateTagResponse{
+	return connect.NewResponse(&tag.CreateTagResponse{
 		Id: param.ID,
-	}, nil
+	}), nil
 }
 
-func (t *TagService) ListTag(ctx context.Context, req *tag.ListTagRequest) (*tag.ListTagResponse, error) {
+func (t *TagService) ListTag(ctx context.Context, req *connect.Request[tag.ListTagRequest]) (*connect.Response[tag.ListTagResponse], error) {
 	param := domain.ListTagParam{
-		Limit:  req.Limit,
-		Offset: req.Offset,
+		Limit:  req.Msg.Limit,
+		Offset: req.Msg.Offset,
 	}
 
 	tags, err := t.tagRepo.ListTag(ctx, param)
@@ -58,21 +60,21 @@ func (t *TagService) ListTag(ctx context.Context, req *tag.ListTagRequest) (*tag
 		})
 	}
 
-	return &tag.ListTagResponse{
+	return connect.NewResponse(&tag.ListTagResponse{
 		Tags: tagList,
-	}, nil
+	}), nil
 }
 
-func (t *TagService) DeleteTag(ctx context.Context, req *tag.DeleteTagRequest) (*tag.DeleteTagResponse, error) {
+func (t *TagService) DeleteTag(ctx context.Context, req *connect.Request[tag.DeleteTagRequest]) (*connect.Response[tag.DeleteTagResponse], error) {
 	param := domain.DeleteTagParam{
-		ID: req.Id,
+		ID: req.Msg.Id,
 	}
 
 	if err := t.tagRepo.DeleteTag(ctx, param); err != nil {
 		return nil, err
 	}
 
-	return &tag.DeleteTagResponse{
+	return connect.NewResponse(&tag.DeleteTagResponse{
 		Success: true,
-	}, nil
+	}), nil
 }
