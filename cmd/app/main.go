@@ -58,9 +58,9 @@ func main() {
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: mux,
 	}
-	// 作成したgRPCサーバーを、8080番ポートで稼働させる
+	// 作成したhttpサーバーを、8080番ポートで稼働させる
 	go func() {
-		log.Printf("start gRPC server port: %v", port)
+		log.Printf("start http server port: %v", port)
 		s.Serve(listener)
 	}()
 
