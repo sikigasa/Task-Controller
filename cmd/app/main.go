@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/sikigasa/task-controller/cmd/config"
-	connect "github.com/sikigasa/task-controller/gen/protov1connect"
 	"github.com/sikigasa/task-controller/internal/infra"
 	postgres "github.com/sikigasa/task-controller/internal/infra/driver"
+	"github.com/sikigasa/task-controller/internal/middleware"
 	"github.com/sikigasa/task-controller/internal/usecase"
 )
 
@@ -48,17 +48,13 @@ func run() error {
 	}
 	defer conn.Close(ctx)
 
-	// connectRPCサーバーを作成
-	mux := http.NewServeMux()
-
+	// Connect RPCサーバーを作成
 	taskService := usecase.NewTaskService(infra.NewTaskRepo(db), infra.NewTagRepo(db), infra.NewTaskTagRepo(db), postgres.NewPostgresTransaction(db))
 	tagService := usecase.NewTagService(infra.NewTagRepo(db))
 
-	taskPath, taskHandler := connect.NewTaskServiceHandler(taskService)
-	tagPath, tagHandler := connect.NewTagServiceHandler(tagService)
-
-	mux.Handle(taskPath, taskHandler)
-	mux.Handle(tagPath, tagHandler)
+	// Routerを使用してルートを設定
+	router := middleware.NewRouter(taskService, tagService)
+	mux := router.SetupRoutes()
 
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
