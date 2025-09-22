@@ -11,9 +11,13 @@ service TaskService {
   // Create a new task.
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
   // Read a task by ID.
-  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse){
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // List all tasks optional limit and offset.
-  rpc ListTask(ListTaskRequest) returns (ListTaskResponse);
+  rpc ListTask(ListTaskRequest) returns (ListTaskResponse){
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // Update an existing task.
   rpc UpdateTask(UpdateTaskRequest) returns (UpdateTaskResponse);
   // Delete a task by ID.
@@ -23,7 +27,9 @@ service TagService {
   // Create a new tag.
   rpc CreateTag(CreateTagRequest) returns (CreateTagResponse);
   // List all tags optional limit and offset.
-  rpc ListTag(ListTagRequest) returns (ListTagResponse);
+  rpc ListTag(ListTagRequest) returns (ListTagResponse){
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
   // Delete a tag by ID.
   rpc DeleteTag(DeleteTagRequest) returns (DeleteTagResponse);
 }

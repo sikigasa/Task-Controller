@@ -88,12 +88,14 @@ func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			httpClient,
 			baseURL+TaskServiceGetTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("GetTask")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		listTask: connect.NewClient[gen.ListTaskRequest, gen.ListTaskResponse](
 			httpClient,
 			baseURL+TaskServiceListTaskProcedure,
 			connect.WithSchema(taskServiceMethods.ByName("ListTask")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		updateTask: connect.NewClient[gen.UpdateTaskRequest, gen.UpdateTaskResponse](
@@ -176,12 +178,14 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 		TaskServiceGetTaskProcedure,
 		svc.GetTask,
 		connect.WithSchema(taskServiceMethods.ByName("GetTask")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	taskServiceListTaskHandler := connect.NewUnaryHandler(
 		TaskServiceListTaskProcedure,
 		svc.ListTask,
 		connect.WithSchema(taskServiceMethods.ByName("ListTask")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	taskServiceUpdateTaskHandler := connect.NewUnaryHandler(
@@ -268,6 +272,7 @@ func NewTagServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...
 			httpClient,
 			baseURL+TagServiceListTagProcedure,
 			connect.WithSchema(tagServiceMethods.ByName("ListTag")),
+			connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 			connect.WithClientOptions(opts...),
 		),
 		deleteTag: connect.NewClient[gen.DeleteTagRequest, gen.DeleteTagResponse](
@@ -328,6 +333,7 @@ func NewTagServiceHandler(svc TagServiceHandler, opts ...connect.HandlerOption) 
 		TagServiceListTagProcedure,
 		svc.ListTag,
 		connect.WithSchema(tagServiceMethods.ByName("ListTag")),
+		connect.WithIdempotency(connect.IdempotencyNoSideEffects),
 		connect.WithHandlerOptions(opts...),
 	)
 	tagServiceDeleteTagHandler := connect.NewUnaryHandler(
