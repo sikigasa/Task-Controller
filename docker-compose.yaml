@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   task-controller:
-    image: postgres:17.5-alpine
+    image: postgres:18.1-alpine
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
